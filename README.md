@@ -79,5 +79,5 @@ Data Necessary:
 - Pictures of campsites
 
 Useful links/Similar projects:
-https://www.lightpollutionmap.info/help.html#FAQ29
-https://darksitefinder.com/map/
+- https://www.lightpollutionmap.info/help.html#FAQ29
+- https://darksitefinder.com/map/
