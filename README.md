@@ -1,7 +1,7 @@
-# **Welcome to StarChaser!!**
+# **Welcome to StarChaser!!!**
 
 
-StarChaser is an app aimed at helping those individuals seaking to enjoy a nice clear sky for stargazing! In it there are 4 main features.
+StarChaser is an app aimed at helping those individuals seaking to enjoy a nice clear sky for stargazing! In it there are 5 main features.
 
 1. Map showing campsites overlayed with the light pollution. Also can zoom in, see different campsites at each level/popular campsites even if don't have great stargazing. Click campsite leads to 2day's report.
 
@@ -34,20 +34,22 @@ StarChaser is an app aimed at helping those individuals seaking to enjoy a nice 
 - Ability to get notifications based on certain news.
 - Advertisements/sponsors
 
-
+5. Night Sky Map
+- Ability to find stars/constellations with phone
 
 Additional Pages/Ideas:
 
-5. Saved trips
+6. Saved trips
 Link to results that have been saved
 
-6. About
+7. About
 - Support/Patreon
 
-7. Login/Settings
+8. Login/Settings
 - Account Info
-- Delete account
 - Suggestions
+- Donate
+- Recieve notifications about star events
 - Explanations
 - Credits
 
@@ -61,8 +63,19 @@ Will be between certain levels of expected light. These will have various factor
 
 Data Necessary:
 - Light pollution
+    - Light Pollution map person recommended: 
+        - https://eogdata.mines.edu/products/vnl/
+        - https://dataservices.gfz-potsdam.de/contact/showshort.php?id=escidoc:1541893&contactform
 - Campsites
-- Weather
+    - National Campsite information: https://www.nps.gov/subjects/developer/api-documentation.htm
+- Weather/Clouds/Smoke
+    - https://www.weatherapi.com/
+    - https://openweathermap.org/api
+- Moon level info
+    - Calculate it?: https://www.subsystems.us/uploads/9/8/9/4/98948044/moonphase.pdf
 - Cool sky news (where's it coming from?)
 - Pictures of campsites
-- Moon level info
+
+Useful links/Similar projects:
+https://www.lightpollutionmap.info/help.html#FAQ29
+https://darksitefinder.com/map/
