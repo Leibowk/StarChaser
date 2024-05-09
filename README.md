@@ -71,6 +71,8 @@ Data Necessary:
 - Weather/Clouds/Smoke
     - https://www.weatherapi.com/
     - https://openweathermap.org/api
+- Navigation
+    - Google maps?: https://developers.google.com/maps/documentation/embed/get-started
 - Moon level info
     - Calculate it?: https://www.subsystems.us/uploads/9/8/9/4/98948044/moonphase.pdf
 - Cool sky news (where's it coming from?)
