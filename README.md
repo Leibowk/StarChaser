@@ -34,6 +34,7 @@ CORE APP:
     - About Page, Support/Patreon
 
 V2/Amazing to have:
+
 5. News - Here you can find any starchasers most important related news!
     - Northern Lights
     - Full moons
