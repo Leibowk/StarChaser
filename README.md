@@ -9,12 +9,13 @@ CORE APP:
 
 2. Search tool - search for best stargazing sites near you! Variables:
     - Weather (clouds)
+        - Important parts cloud coverage/hase (smoke, fog, AQI, pollution)
     - Light pollution
     - Moon level
     - Elevation? (does this effect anything? hahaha)
     - User ratings? (good spot regionally, but maybe campgrounds have tall trees?)
     - Distance
-    - Dates
+    - Datetime (time of day too.)
     - Average level of stargazing (custom algorithm - determines from Horrible, Bad, Meh, Good, Great, Awesome, Spectacular)
 
 3. Sites - Page displaying information about indiviudal stargazing sites. Here you can see:
