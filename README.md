@@ -7,7 +7,8 @@ CORE APP:
 1. Map showing campsites overlayed with the light pollution. Also can zoom in, see different campsites at each level/popular campsites even if don't have great stargazing. Click campsite leads to 2day's report.
     -Incoporate tools from Search into map (auto select today, but can select other dates)
 
-2. Search tool - search for best stargazing sites near you! Variables:
+2. Search tool - search for best stargazing sites near you! Exp: I have an hour and want to find the best dark place with a clear sky to see a meteor shower.
+    Search will use multiple variables to deduce sky visibility:
     - Weather (clouds)
         - Important parts cloud coverage/hase (smoke, fog, AQI, pollution)
     - Light pollution
@@ -16,7 +17,7 @@ CORE APP:
     - User ratings? (good spot regionally, but maybe campgrounds have tall trees?)
     - Distance
     - Datetime (time of day too.)
-    - Average level of stargazing (custom algorithm - determines from Horrible, Bad, Meh, Good, Great, Awesome, Spectacular)
+    - Determined by these other variables - can search based on average level of stargazing (custom algorithm - determines from Horrible, Bad, Meh, Good, Great, Awesome, Spectacular)
 
 3. Sites - Page displaying information about indiviudal stargazing sites. Here you can see:
     - Pictures
