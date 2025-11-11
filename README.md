@@ -90,3 +90,5 @@ Data Necessary:
 Useful links/Similar projects:
 - https://www.lightpollutionmap.info/help.html#FAQ29
 - https://darksitefinder.com/map/
+- https://djlorenz.github.io/astronomy/lp/
+- https://github.com/djlorenz/djlorenz.github.io/blob/master/astronomy
