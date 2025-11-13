@@ -1,8 +1,73 @@
 import { StatusBar } from 'expo-status-bar';
 import { StyleSheet, View } from 'react-native';
 import { WebView } from 'react-native-webview';
+import { useEffect, useState } from 'react';
+import { Asset } from 'expo-asset';
+import { formatParkPopup } from './parkDetails';
 
-const MAPLIBRE_HTML = `
+// Calculate centroid of a polygon
+function calculateCentroid(coordinates: number[][][]): [number, number] {
+  let x = 0;
+  let y = 0;
+  let count = 0;
+  
+  // Flatten all coordinates
+  for (const ring of coordinates) {
+    for (const coord of ring) {
+      x += coord[0];
+      y += coord[1];
+      count++;
+    }
+  }
+  
+  return [x / count, y / count];
+}
+
+// Calculate centroid for MultiPolygon or Polygon geometry
+function getFeatureCenter(feature: any): [number, number] | null {
+  const geom = feature.geometry;
+  if (geom.type === 'Polygon') {
+    return calculateCentroid(geom.coordinates);
+  } else if (geom.type === 'MultiPolygon') {
+    // Use the first polygon for simplicity
+    return calculateCentroid(geom.coordinates[0]);
+  }
+  return null;
+}
+
+export default function App() {
+  const [htmlContent, setHtmlContent] = useState<string>('');
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    async function loadMapData() {
+      try {
+        // Load the GeoJSON file as an asset and fetch it (avoid expo-file-system)
+        const geojsonAsset = Asset.fromModule(require('../assets/National_Parks.geojson'));
+        await geojsonAsset.downloadAsync();
+        const geojsonUri = geojsonAsset.localUri || geojsonAsset.uri;
+
+        // Use fetch to load the asset contents (avoids expo-file-system deprecation)
+        const geojsonResp = await fetch(geojsonUri);
+        const geojsonData = await geojsonResp.json();
+
+        // Extract park locations (centroids), names and prebuilt details HTML
+        const parks = geojsonData.features
+          .map((feature: any) => {
+            const center = getFeatureCenter(feature);
+            if (center) {
+              return {
+                name: feature.properties.NAME || 'Park',
+                coordinates: center,
+                detailsHtml: formatParkPopup(feature.properties),
+              };
+            }
+            return null;
+          })
+          .filter((park: any) => park !== null);
+
+        // Generate HTML with map and markers
+        const html = `
 <!DOCTYPE html>
 <html>
 <head>
@@ -41,24 +106,98 @@ const MAPLIBRE_HTML = `
                     }
                 ]
             },
-            center: [-98.5795, 39.8283], // Center of USA
-            zoom: 3
-            // center: [-120.77, 47.20], // Center of WA
-            // zoom: 5
+            center: [-98.5795, 39.8283],
+            zoom: 4
         });
         
         map.addControl(new maplibregl.NavigationControl());
         map.addControl(new maplibregl.ScaleControl(), 'bottom-left');
+        
+        // Wait for map to load
+        map.on('load', function() {
+      // Parks data
+      const parks = ${JSON.stringify(parks)};
+
+      // Add source with park points
+      map.addSource('parks', {
+        'type': 'geojson',
+        'data': {
+          'type': 'FeatureCollection',
+          'features': parks.map(park => ({
+            'type': 'Feature',
+            'geometry': {
+              'type': 'Point',
+              'coordinates': park.coordinates
+            },
+            'properties': {
+              'name': park.name,
+              'detailsHtml': park.detailsHtml
+            }
+          }))
+        }
+      });
+
+      // Use a circle layer for parks (no external image required)
+      map.addLayer({
+        id: 'parks',
+        type: 'circle',
+        source: 'parks',
+        paint: {
+          'circle-radius': 6,
+          'circle-color': '#2E8B57',
+          'circle-stroke-color': '#ffffff',
+          'circle-stroke-width': 1
+        }
+      });
+                
+                // Add click handler for parks
+      map.on('click', 'parks', function(e) {
+        const coordinates = e.features[0].geometry.coordinates.slice();
+        const html = e.features[0].properties.detailsHtml || ('<strong>' + e.features[0].properties.name + '</strong>');
+
+        new maplibregl.Popup()
+          .setLngLat(coordinates)
+          .setHTML(html)
+          .addTo(map);
+      });
+                
+      // Change cursor on hover
+      map.on('mouseenter', 'parks', function() {
+        map.getCanvas().style.cursor = 'pointer';
+      });
+
+      map.on('mouseleave', 'parks', function() {
+        map.getCanvas().style.cursor = '';
+      });
+        });
     </script>
 </body>
 </html>
-`;
+        `;
 
-export default function App() {
+        setHtmlContent(html);
+        setLoading(false);
+      } catch (error) {
+        console.error('Error loading map data:', error);
+        setLoading(false);
+      }
+    }
+
+    loadMapData();
+  }, []);
+
+  if (loading) {
+    return (
+      <View style={styles.container}>
+        <StatusBar style="auto" />
+      </View>
+    );
+  }
+
   return (
     <View style={styles.container}>
       <WebView
-        source={{ html: MAPLIBRE_HTML }}
+        source={{ html: htmlContent }}
         style={styles.webview}
         javaScriptEnabled={true}
         domStorageEnabled={true}
