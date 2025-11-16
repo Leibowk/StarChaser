@@ -3,13 +3,15 @@
 Frontend:
 React Native Expo
 
-Start app: npx expo start --clear
-
 Backend:
 Fast API
 
-pip install fastapi
+PreReques:
+uvicorn
 
-pip install uvicorn
+Start app: npx expo start --clear
+
+Run Backend: uvicorn main:app --reload
+
 
 
