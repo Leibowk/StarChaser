@@ -4,6 +4,7 @@ import { WebView } from 'react-native-webview';
 import { useEffect, useState } from 'react';
 import { Asset } from 'expo-asset';
 import { formatParkPopup } from './parkDetails';
+import { fetch } from 'expo/fetch'
 
 // Calculate centroid of a polygon
 function calculateCentroid(coordinates: number[][][]): [number, number] {
@@ -42,6 +43,12 @@ export default function App() {
   useEffect(() => {
     async function loadMapData() {
       try {
+
+        // how do I connect to my server? 
+        // let response = await fetch("http://127.0.0.1:8000/sites");
+        // let sites = await response.json();
+        // console.log(sites);
+
         // Load the GeoJSON file as an asset and fetch it (avoid expo-file-system)
         const geojsonAsset = Asset.fromModule(require('../assets/National_Parks.geojson'));
         await geojsonAsset.downloadAsync();
