@@ -7,6 +7,9 @@ import { formatParkPopup } from './parkDetails';
 import { fetch } from 'expo/fetch'
 
 // Calculate centroid of a polygon
+
+const API_URL = "http://192.168.1.17:3000";
+
 function calculateCentroid(coordinates: number[][][]): [number, number] {
   let x = 0;
   let y = 0;
@@ -45,8 +48,14 @@ export default function App() {
       try {
 
         // how do I connect to my server? 
-        // let response = await fetch("http://127.0.0.1:8000/sites");
-        // let sites = await response.json();
+        let response = await fetch(`${API_URL}/sites`);
+        let sites = await response.json();
+
+        const parks = sites.map((site: any) => ({
+          name: site.name,
+          coordinates: [site.longitude, site.latitude], // maplibre uses [lng, lat]
+          detailsHtml: `<h3>${site.name}</h3><p>${site.description}</p>`
+        }));
         // console.log(sites);
 
         // Load the GeoJSON file as an asset and fetch it (avoid expo-file-system)
@@ -58,20 +67,6 @@ export default function App() {
         const geojsonResp = await fetch(geojsonUri);
         const geojsonData = await geojsonResp.json();
 
-        // Extract park locations (centroids), names and prebuilt details HTML
-        const parks = geojsonData.features
-          .map((feature: any) => {
-            const center = getFeatureCenter(feature);
-            if (center) {
-              return {
-                name: feature.properties.NAME || 'Park',
-                coordinates: center,
-                detailsHtml: formatParkPopup(feature.properties),
-              };
-            }
-            return null;
-          })
-          .filter((park: any) => park !== null);
 
         // Generate HTML with map and markers
         const html = `
@@ -113,8 +108,8 @@ export default function App() {
                     }
                 ]
             },
-            center: [-98.5795, 39.8283],
-            zoom: 4
+            center: [-122.519, 48.755],
+            zoom: 10
         });
         
         map.addControl(new maplibregl.NavigationControl());
