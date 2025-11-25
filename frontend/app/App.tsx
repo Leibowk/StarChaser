@@ -56,17 +56,6 @@ export default function App() {
           coordinates: [site.longitude, site.latitude], // maplibre uses [lng, lat]
           detailsHtml: `<h3>${site.name}</h3><p>${site.description}</p>`
         }));
-        // console.log(sites);
-
-        // Load the GeoJSON file as an asset and fetch it (avoid expo-file-system)
-        const geojsonAsset = Asset.fromModule(require('../assets/National_Parks.geojson'));
-        await geojsonAsset.downloadAsync();
-        const geojsonUri = geojsonAsset.localUri || geojsonAsset.uri;
-
-        // Use fetch to load the asset contents (avoids expo-file-system deprecation)
-        const geojsonResp = await fetch(geojsonUri);
-        const geojsonData = await geojsonResp.json();
-
 
         // Generate HTML with map and markers
         const html = `
