@@ -4,7 +4,7 @@
 StarChaser is an app aimed at helping those individuals seaking to enjoy a nice clear sky for stargazing! In it there are 5 main features.
 
 CORE APP:
-1. Map showing campsites overlayed with the light pollution. Also can zoom in, see different campsites at each level/popular campsites even if don't have great stargazing. Click campsite leads to 2day's report. Click somewhere shows you the spots stargazing report. Map should load with a certain zoom level say of USA and have maybe 20-50 best places for stargazing (semi widely spread across the map). Then as you zoom in, we should continue to re-render and show the best spots (maybe 20-50 idk). So first in USA shows places, then in WA, then in Whatcom County for example as you zoom.
+1. Map showing campsites overlayed with map of visibility of stars. Can start with just light pollution, but eventually will be mixed with weather/AQI/cloud/general visibility.  So should have a guide of no stargazing to perfect stargazing and be color coded based on that. Also can zoom in, see different campsites at each level/popular campsites even if don't have great stargazing. Click campsite leads to 2day's report. Click somewhere shows you the spots stargazing report. Map should load with a certain zoom level say of USA and have maybe 20-50 best places for stargazing (semi widely spread across the map). Then as you zoom in, we should continue to re-render and show the best spots (maybe 20-50 idk). So first in USA shows places, then in WA, then in Whatcom County for example as you zoom.
     -Incoporate tools from Search into map (auto select today, but can select other dates)
 
 2. Search tool - search for best stargazing sites near you! Exp: I have an hour and want to find the best dark place with a clear sky to see a meteor shower.
@@ -18,6 +18,7 @@ CORE APP:
     - Distance
     - Datetime (time of day too.)
     - Determined by these other variables - can search based on average level of stargazing (custom algorithm - determines from Horrible, Bad, Meh, Good, Great, Awesome, Spectacular)
+    Will return a list of sites that meet your criteria. Sites should be ranked by Stargazing Score -> Rating -> Distance/Travel Time
 
 3. Sites - Page displaying information about indiviudal stargazing sites. Here you can see:
     - Pictures
