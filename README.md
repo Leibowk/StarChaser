@@ -6,6 +6,10 @@ React Native Expo
 Backend:
 Fast API
 
+DB:
+PostgreSQL and PostgreGIS
+https://www.postgresql.org/download/windows/
+
 PreReques:
 uvicorn
 
