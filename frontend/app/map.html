@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link
+    rel="stylesheet"
+    href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+  />
+  <style>
+    html, body, #map {
+      height: 100%;
+      margin: 0;
+    }
+  </style>
+</head>
+<body>
+  <div id="map"></div>
+
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+
+  <script>
+    // Base layers
+    const osm = L.tileLayer(
+      'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',
+      { maxZoom: 19, attribution: '© OpenStreetMap contributors' }
+    );
+
+    const light2024 = L.tileLayer(
+      'http://192.168.1.17:3000/tiles/tiles2024/tile_{z}_{x}_{y}.png',
+      {
+        minZoom: 2,
+        maxNativeZoom: 8,
+        maxZoom: 19,
+        tileSize: 1024,
+        zoomOffset: -2,
+        opacity: 0.5
+      }
+    );
+
+    const map = L.map('map', {
+      center: [48.75, -122.52],
+      zoom: 9,
+      layers: [osm, light2024]
+    });
+
+    L.control.layers(
+      { OpenStreetMap: osm },
+      { '2024 Light Pollution': light2024 }
+    ).addTo(map);
+
+    // Layer for parks
+    const parkLayer = L.layerGroup().addTo(map);
+
+    // Called from React Native
+    window.renderParks = function(parks) {
+      parkLayer.clearLayers();
+
+      parks.forEach(p => {
+        const marker = L.circleMarker([p.lat, p.lng], {
+          radius: 6,
+          color: '#2E8B57',
+          fillOpacity: 0.9
+        });
+
+        marker.bindPopup(p.detailsHtml);
+        marker.addTo(parkLayer);
+      });
+    };
+  </script>
+</body>
+</html>

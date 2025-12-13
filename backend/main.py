@@ -1,6 +1,8 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from repositories.site_repo import SiteRepository
+from fastapi.staticfiles import StaticFiles
+import os
 
 app = FastAPI()
 
@@ -22,9 +24,9 @@ app.add_middleware(
 # Initialize repository
 site_repo = SiteRepository()
 
-@app.get("/")
-def root():
-    return {"Hello": "World"}
+# Serve your image_tiles folder
+tiles_path = os.path.join(os.path.dirname(__file__), "image_tiles")
+app.mount("/tiles", StaticFiles(directory=tiles_path), name="tiles")
 
 @app.get("/sites")
 def get_sites():
