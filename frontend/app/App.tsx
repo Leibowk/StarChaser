@@ -3,7 +3,6 @@ import { StyleSheet, View } from 'react-native';
 import { WebView } from 'react-native-webview';
 import { useEffect, useState } from 'react';
 import { Asset } from 'expo-asset';
-import { formatParkPopup } from './parkDetails';
 import { fetch } from 'expo/fetch'
 import pako from 'pako';
 
