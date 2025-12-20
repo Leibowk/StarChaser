@@ -19,7 +19,6 @@
   <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 
   <script>
-    // Base layers
     const osm = L.tileLayer(
       'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',
       { maxZoom: 19, attribution: '© OpenStreetMap contributors' }
@@ -43,26 +42,35 @@
       layers: [osm, light2024]
     });
 
-    L.control.layers(
-      { OpenStreetMap: osm },
-      { '2024 Light Pollution': light2024 }
-    ).addTo(map);
+    L.control.layers({ OpenStreetMap: osm }, { '2024 Light Pollution': light2024 }).addTo(map);
 
-    // Layer for parks
     const parkLayer = L.layerGroup().addTo(map);
 
-    // Called from React Native
-    window.renderParks = function(parks) {
+    window.renderSites = function (sites) {
       parkLayer.clearLayers();
 
-      parks.forEach(p => {
-        const marker = L.circleMarker([p.lat, p.lng], {
-          radius: 6,
-          color: '#2E8B57',
-          fillOpacity: 0.9
-        });
+      sites.forEach(site => {
+        const marker = L.circleMarker(
+          [site.latitude, site.longitude],
+          {
+            radius: 6,
+            color: '#2E8B57',
+            fillOpacity: 0.9
+          }
+        );
 
-        marker.bindPopup(p.detailsHtml);
+        const lp = site.lightPollution;
+
+        const popupHtml = `
+          <h3>${site.name}</h3>
+          <p>${site.description}</p>
+          <b>Light Pollution</b><br/>
+          Zone: ${lp?.lpZone ?? 'N/A'}<br/>
+          Index: ${lp?.lpIndex?.toFixed(3) ?? 'N/A'}<br/>
+          mag/arcsec²: ${lp?.magArcSec?.toFixed(2) ?? 'N/A'}
+        `;
+
+        marker.bindPopup(popupHtml);
         marker.addTo(parkLayer);
       });
     };
