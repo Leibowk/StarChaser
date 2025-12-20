@@ -2,9 +2,8 @@ import { WebView } from 'react-native-webview';
 import { Asset } from 'expo-asset';
 import { useEffect, useState } from 'react';
 import { Site } from '../lib/types';
-import { useNavigation } from '@react-navigation/native';
-import { RootStackParamList } from '../lib/navigation';
-import { NativeStackNavigationProp } from '@react-navigation/native-stack';
+import { useRouter } from 'expo-router';
+import { setCurrentSite } from '../lib/SiteStore';
 
 type Props = {
   sites: Site[];
@@ -12,6 +11,7 @@ type Props = {
 
 export function MapWebView({ sites }: Props) {
   const [html, setHtml] = useState<string | null>(null);
+  const router = useRouter();
 
   useEffect(() => {
     async function loadHtml() {
@@ -20,9 +20,20 @@ export function MapWebView({ sites }: Props) {
       const text = await (await fetch(asset.uri)).text();
       setHtml(text);
     }
-
     loadHtml();
   }, []);
+
+  const handleMessage = (event: any) => {
+    try {
+      const data = JSON.parse(event.nativeEvent.data);
+      if (data.type === 'siteClick' && data.site) {
+        setCurrentSite(data.site); // store the site in memory
+        router.push('/SiteDetailScreen'); // just navigate to the page
+      }
+    } catch (e) {
+      console.warn('Invalid message from WebView', e);
+    }
+  };
 
   if (!html) return null;
 
@@ -38,6 +49,7 @@ export function MapWebView({ sites }: Props) {
       `}
       javaScriptEnabled
       domStorageEnabled
+      onMessage={handleMessage}
     />
   );
 }
