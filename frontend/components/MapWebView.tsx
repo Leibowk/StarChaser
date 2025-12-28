@@ -25,9 +25,9 @@ export function MapWebView({ sites }: Props) {
   const onMessage = (event: WebViewMessageEvent) => {
     try {
       const data = JSON.parse(event.nativeEvent.data);
-      if (data.type === 'siteClick' && data.site?.id) {
+      if (data.type === 'siteClick' && data.site) {
         // Push to the dynamic route with the site id
-        router.push(`/site/${data.site.id}`);
+        router.push(`/site/${data.site}`);
       }
     } catch (e) {
       // handle error

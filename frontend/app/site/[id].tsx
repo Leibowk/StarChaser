@@ -33,7 +33,7 @@ export default function SiteDetailScreen() {
       })
       .then((data) => {
         setSite(data);
-        navigation.setOptions({ title: `${data?.name}` });
+        navigation.setOptions({ title: data.name });
         setError(null);
       })
       .catch((err) => setError(err.message))

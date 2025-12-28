@@ -70,7 +70,7 @@
           Zone: ${lp?.lpZone ?? 'N/A'}<br/>
           Index: ${lp?.lpIndex?.toFixed(3) ?? 'N/A'}<br/>
           mag/arcsec²: ${lp?.magArcSec?.toFixed(2) ?? 'N/A'}<br/>
-          <button onclick='window.ReactNativeWebView && window.ReactNativeWebView.postMessage(JSON.stringify({ type: "siteClick", site: ${JSON.stringify(site)} }))'>
+          <button onclick='window.ReactNativeWebView && window.ReactNativeWebView.postMessage(JSON.stringify({ type: "siteClick", site: ${JSON.stringify(site.id)} }))'>
             View Details
           </button>
         `;
