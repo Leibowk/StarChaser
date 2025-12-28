@@ -34,3 +34,7 @@ app.mount("/bi_tiles", StaticFiles(directory=bi_tiles_path, html=False), name="b
 @app.get("/sites")
 def get_sites():
     return site_repo.get_all_sites()
+
+@app.get("/site/{site_id}")
+def get_site(site_id):
+    return site_repo.get_site(site_id)
