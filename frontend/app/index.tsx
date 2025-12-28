@@ -11,7 +11,7 @@ if (!API_URL) {
   throw new Error('EXPO_PUBLIC_BACKEND_API_URL is not set');
 }
 
-export function MapScreen() {
+export default function MapScreen() {
   const [sites, setSites] = useState<Site[]>([]);
   const [loading, setLoading] = useState(true);
 

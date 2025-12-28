@@ -2,7 +2,6 @@ import pako from 'pako';
 import { fetch } from 'expo/fetch';
 import { LightPollutionData } from './types';
 
-
 const API_URL = process.env.EXPO_PUBLIC_BACKEND_API_URL;
 
 if (!API_URL) {

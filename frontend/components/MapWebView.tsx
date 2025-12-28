@@ -1,9 +1,8 @@
-import { WebView } from 'react-native-webview';
+import { WebView, WebViewMessageEvent } from 'react-native-webview';
 import { Asset } from 'expo-asset';
 import { useEffect, useState } from 'react';
 import { Site } from '../lib/types';
 import { useRouter } from 'expo-router';
-import { setCurrentSite } from '../lib/SiteStore';
 
 type Props = {
   sites: Site[];
@@ -23,15 +22,15 @@ export function MapWebView({ sites }: Props) {
     loadHtml();
   }, []);
 
-  const handleMessage = (event: any) => {
+  const onMessage = (event: WebViewMessageEvent) => {
     try {
       const data = JSON.parse(event.nativeEvent.data);
-      if (data.type === 'siteClick' && data.site) {
-        setCurrentSite(data.site); // store the site in memory
-        router.push('/SiteDetailScreen'); // just navigate to the page
+      if (data.type === 'siteClick' && data.site?.id) {
+        // Push to the dynamic route with the site id
+        router.push(`/site/${data.site.id}`);
       }
     } catch (e) {
-      console.warn('Invalid message from WebView', e);
+      // handle error
     }
   };
 
@@ -53,7 +52,7 @@ export function MapWebView({ sites }: Props) {
       `}
       javaScriptEnabled
       domStorageEnabled
-      onMessage={handleMessage}
+      onMessage={onMessage}
     />
   );
 }
