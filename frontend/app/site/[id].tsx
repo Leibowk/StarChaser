@@ -1,14 +1,8 @@
 import { View, Text, StyleSheet, ActivityIndicator } from 'react-native';
 import { useLocalSearchParams, useNavigation} from 'expo-router';
 import { useEffect, useState } from 'react';
-
-type Site = {
-  id: number;
-  name: string;
-  description: string;
-  latitude: number;
-  longitude: number;
-};
+import { LightPollutionData, Site } from '../../lib/types';
+import { getLightPollution } from '../../lib/lightPollution';
 
 export default function SiteDetailScreen() {
   const API_URL = process.env.EXPO_PUBLIC_BACKEND_API_URL;
@@ -18,27 +12,35 @@ export default function SiteDetailScreen() {
   }
   const { id } = useLocalSearchParams<{ id: string }>();
   const [site, setSite] = useState<Site | null>(null);
+  const [lightPollution, setLightPollution] = useState<LightPollutionData | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const navigation = useNavigation();
 
 
-  useEffect(() => {
+useEffect(() => {
+  async function fetchSite() {
     if (!id) return;
     setLoading(true);
-    fetch(`${API_URL}/site/${id}`)
-      .then((res) => {
-        if (!res.ok) throw new Error('Failed to fetch site');
-        return res.json();
-      })
-      .then((data) => {
-        setSite(data);
-        navigation.setOptions({ title: data.name });
-        setError(null);
-      })
-      .catch((err) => setError(err.message))
-      .finally(() => setLoading(false));
-  }, [id, navigation]);
+    try {
+      const res = await fetch(`${API_URL}/site/${id}`);
+      if (!res.ok) throw new Error('Failed to fetch site');
+      const data = await res.json();
+      setSite(data);
+      navigation.setOptions({ title: data.name });
+      setError(null);
+
+      // Call getLightPollution after site is fetched
+      const lp = await getLightPollution(data.latitude, data.longitude);
+      setLightPollution(lp);
+    } catch (err: any) {
+      setError(err.message);
+    } finally {
+      setLoading(false);
+    }
+  }
+  fetchSite();
+}, [id, navigation]);
 
   if (loading) return <ActivityIndicator />;
   if (error) return <Text>Error: {error}</Text>;
@@ -47,11 +49,19 @@ export default function SiteDetailScreen() {
   return (
     <View style={{ padding: 16 }}>
       <Text style={{ fontSize: 24, fontWeight: 'bold' }}>{site.name}</Text>
-      <Text>{site.id}</Text>
-      <Text>{site.description}</Text>
+      <Text>Site ID: {site.id}</Text>
+      <Text>Description: {site.description}</Text>
       <Text>Latitude: {site.latitude}</Text>
-      <Text>Longitude: {site.longitude}</Text>
-      {/* Add more fields as needed */}
+      <Text>Light Pollution</Text>
+      <Text>Zone: {lightPollution?.lpZone ?? 'N/A'}</Text>
+      <Text>Index: {lightPollution?.lpIndex?.toFixed(3) ?? 'N/A'}</Text>
+      <Text>mag/arcsec²: {lightPollution?.magArcSec?.toFixed(2) ?? 'N/A'}</Text>
+      {/* 
+        <b>Light Pollution</b><br/>
+          Zone: ${lp?.lpZone ?? 'N/A'}<br/>
+          Index: ${lp?.lpIndex?.toFixed(3) ?? 'N/A'}<br/>
+          mag/arcsec²: ${lp?.magArcSec?.toFixed(2) ?? 'N/A'}<br/>
+      Add more fields as needed */}
     </View>
   );
 }
