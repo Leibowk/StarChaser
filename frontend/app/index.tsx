@@ -4,6 +4,7 @@ import { fetch } from 'expo/fetch';
 import { Site } from '../lib/types';
 import { getLightPollution } from '../lib/lightPollution';
 import { MapWebView } from '../components/MapWebView';
+import { useNavigation } from 'expo-router';
 
 const API_URL = process.env.EXPO_PUBLIC_BACKEND_API_URL;
 
@@ -14,8 +15,11 @@ if (!API_URL) {
 export default function MapScreen() {
   const [sites, setSites] = useState<Site[]>([]);
   const [loading, setLoading] = useState(true);
+  const navigation = useNavigation();
+  
 
   useEffect(() => {
+    navigation.setOptions({ title: 'StarChaser' });
     async function load() {
       try {
         const response = await fetch(`${API_URL}/sites`);

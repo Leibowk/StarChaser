@@ -1,5 +1,5 @@
 import { View, Text, StyleSheet, ActivityIndicator } from 'react-native';
-import { useLocalSearchParams} from 'expo-router';
+import { useLocalSearchParams, useNavigation} from 'expo-router';
 import { useEffect, useState } from 'react';
 
 type Site = {
@@ -20,6 +20,8 @@ export default function SiteDetailScreen() {
   const [site, setSite] = useState<Site | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const navigation = useNavigation();
+
 
   useEffect(() => {
     if (!id) return;
@@ -31,11 +33,12 @@ export default function SiteDetailScreen() {
       })
       .then((data) => {
         setSite(data);
+        navigation.setOptions({ title: `${data?.name}` });
         setError(null);
       })
       .catch((err) => setError(err.message))
       .finally(() => setLoading(false));
-  }, [id]);
+  }, [id, navigation]);
 
   if (loading) return <ActivityIndicator />;
   if (error) return <Text>Error: {error}</Text>;
@@ -44,6 +47,7 @@ export default function SiteDetailScreen() {
   return (
     <View style={{ padding: 16 }}>
       <Text style={{ fontSize: 24, fontWeight: 'bold' }}>{site.name}</Text>
+      <Text>{site.id}</Text>
       <Text>{site.description}</Text>
       <Text>Latitude: {site.latitude}</Text>
       <Text>Longitude: {site.longitude}</Text>
