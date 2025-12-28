@@ -56,12 +56,7 @@ useEffect(() => {
       <Text>Zone: {lightPollution?.lpZone ?? 'N/A'}</Text>
       <Text>Index: {lightPollution?.lpIndex?.toFixed(3) ?? 'N/A'}</Text>
       <Text>mag/arcsec²: {lightPollution?.magArcSec?.toFixed(2) ?? 'N/A'}</Text>
-      {/* 
-        <b>Light Pollution</b><br/>
-          Zone: ${lp?.lpZone ?? 'N/A'}<br/>
-          Index: ${lp?.lpIndex?.toFixed(3) ?? 'N/A'}<br/>
-          mag/arcsec²: ${lp?.magArcSec?.toFixed(2) ?? 'N/A'}<br/>
-      Add more fields as needed */}
+      {/* Add more fields as needed */}
     </View>
   );
 }
