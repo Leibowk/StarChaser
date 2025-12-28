@@ -18,14 +18,20 @@
 
   <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 
-  <script>
+<script>
+  window.initMap = function() {
     const osm = L.tileLayer(
       'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',
       { maxZoom: 19, attribution: '© OpenStreetMap contributors' }
     );
 
+    if (!window.__API_URL__) {
+      console.error('API_URL not set');
+      return;
+    }
+
     const light2024 = L.tileLayer(
-      'http://192.168.1.17:3000/tiles/tiles2024/tile_{z}_{x}_{y}.png',
+      `${window.__API_URL__}/tiles/tiles2024/tile_{z}_{x}_{y}.png`,
       {
         minZoom: 2,
         maxNativeZoom: 8,
@@ -48,16 +54,12 @@
 
     window.renderSites = function (sites) {
       parkLayer.clearLayers();
-
       sites.forEach(site => {
-        const marker = L.circleMarker(
-          [site.latitude, site.longitude],
-          {
-            radius: 6,
-            color: '#2E8B57',
-            fillOpacity: 0.9
-          }
-        );
+        const marker = L.circleMarker([site.latitude, site.longitude], {
+          radius: 6,
+          color: '#2E8B57',
+          fillOpacity: 0.9
+        });
 
         const lp = site.lightPollution;
 
@@ -68,17 +70,15 @@
           Zone: ${lp?.lpZone ?? 'N/A'}<br/>
           Index: ${lp?.lpIndex?.toFixed(3) ?? 'N/A'}<br/>
           mag/arcsec²: ${lp?.magArcSec?.toFixed(2) ?? 'N/A'}<br/>
-          <button onclick='window.ReactNativeWebView && window.ReactNativeWebView.postMessage(JSON.stringify({ type: "siteClick", site: ${JSON.stringify(
-            site
-          )} }))'>
+          <button onclick='window.ReactNativeWebView && window.ReactNativeWebView.postMessage(JSON.stringify({ type: "siteClick", site: ${JSON.stringify(site)} }))'>
             View Details
           </button>
         `;
-
         marker.bindPopup(popupHtml);
         marker.addTo(parkLayer);
       });
     };
-  </script>
+  };
+</script>
 </body>
 </html>

@@ -42,6 +42,10 @@ export function MapWebView({ sites }: Props) {
       source={{ html }}
       injectedJavaScript={`
         window.SITES_DATA = ${JSON.stringify(sites)};
+        window.__API_URL__ = '${process.env.EXPO_PUBLIC_BACKEND_API_URL}';
+        if (window.initMap) {
+         window.initMap();
+        }
         if (window.renderSites) {
           window.renderSites(window.SITES_DATA);
         }

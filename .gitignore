@@ -12,6 +12,9 @@ expo-env.d.ts
 #Settings
 localsettings.json
 
+#env variables
+.env*
+
 # Native
 .kotlin/
 *.orig.*

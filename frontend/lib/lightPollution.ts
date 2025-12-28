@@ -2,7 +2,12 @@ import pako from 'pako';
 import { fetch } from 'expo/fetch';
 import { LightPollutionData } from './types';
 
-const API_URL = "http://192.168.1.17:3000";
+
+const API_URL = process.env.EXPO_PUBLIC_BACKEND_API_URL;
+
+if (!API_URL) {
+  throw new Error('EXPO_PUBLIC_BACKEND_API_URL is not set');
+}
 
 export async function getLightPollution(
   lat: number,

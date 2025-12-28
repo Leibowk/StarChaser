@@ -5,7 +5,11 @@ import { Site } from '../lib/types';
 import { getLightPollution } from '../lib/lightPollution';
 import { MapWebView } from '../components/MapWebView';
 
-const API_URL = "http://192.168.1.17:3000";
+const API_URL = process.env.EXPO_PUBLIC_BACKEND_API_URL;
+
+if (!API_URL) {
+  throw new Error('EXPO_PUBLIC_BACKEND_API_URL is not set');
+}
 
 export function MapScreen() {
   const [sites, setSites] = useState<Site[]>([]);
