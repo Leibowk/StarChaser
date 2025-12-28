@@ -6,7 +6,11 @@ export default function Layout() {
     return (
     <React.Fragment>
       <StatusBar style="auto" />
-      <Stack />
+      <Stack 
+        screenOptions={{
+          headerTitleAlign: 'center',
+        }}
+      />
     </React.Fragment>
   );
 }
