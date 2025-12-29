@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link
+    rel="stylesheet"
+    href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+  />
+  <style>
+    html, body, #map {
+      height: 100%;
+      margin: 0;
+    }
+    .space-popup {
+      background: linear-gradient(135deg, #181c2f 80%, #232946 100%);
+      color: #e0e6f7;
+      border-radius: 12px;
+      box-shadow: 0 0 12px #000a, 0 0 40px #2d2d6e88;
+      padding: 16px 18px 12px 18px;
+      font-family: 'Segoe UI', 'Arial', sans-serif;
+      min-width: 220px;
+      max-width: 320px;
+    }
+    .space-popup h3 {
+      color: #ffd700;
+      margin: 0 0 8px 0;
+      font-size: 1.2em;
+      text-shadow: 0 0 6px #000, 0 0 2px #fff2;
+    }
+    .space-popup p {
+      margin: 0 0 10px 0;
+      color: #b0c4de;
+    }
+    .space-popup b {
+      color: #7ecfff;
+      font-weight: 600;
+      letter-spacing: 0.5px;
+    }
+    .space-popup .lp-zone {
+      font-weight: bold;
+      color: #ffb347;
+      margin-left: 4px;
+    }
+    .space-popup .lp-color {
+      margin-left: 4px;
+      font-size: 1.1em;
+      vertical-align: middle;
+    }
+    .space-popup .popup-btn {
+      margin-top: 10px;
+      background: linear-gradient(90deg, #232946 60%, #181c2f 100%);
+      color: #ffd700;
+      border: none;
+      border-radius: 6px;
+      padding: 7px 16px;
+      font-size: 1em;
+      font-weight: 600;
+      cursor: pointer;
+      box-shadow: 0 2px 8px #0004;
+      transition: background 0.2s, color 0.2s;
+    }
+    .space-popup .popup-btn:hover {
+      background: #ffd700;
+      color: #232946;
+    }
+    .leaflet-popup-content-wrapper, .leaflet-popup-tip {
+      background: transparent !important;
+      box-shadow: none !important;
+    }
+  </style>
+</head>
+<body>
+  <div id="map"></div>
+
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+
+<script>
+  window.initMap = function() {
+    const osm = L.tileLayer(
+      'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',
+      { maxZoom: 19, attribution: '© OpenStreetMap contributors' }
+    );
+
+    if (!window.__API_URL__) {
+      console.error('API_URL not set');
+      return;
+    }
+
+    const light2024 = L.tileLayer(
+      `${window.__API_URL__}/tiles/tiles2024/tile_{z}_{x}_{y}.png`,
+      {
+        minZoom: 2,
+        maxNativeZoom: 8,
+        maxZoom: 19,
+        tileSize: 1024,
+        zoomOffset: -2,
+        opacity: 0.5
+      }
+    );
+
+    const map = L.map('map', {
+      center: [48.75, -122.52],
+      zoom: 9,
+      layers: [osm, light2024]
+    });
+
+    L.control.layers({ OpenStreetMap: osm }, { '2024 Light Pollution': light2024 }).addTo(map);
+
+    const parkLayer = L.layerGroup().addTo(map);
+
+    // Define the custom telescope icon
+    const telescopeIcon = L.divIcon({
+      html: '🔭',
+      className: 'telescope-marker',
+      iconSize: [36, 36],
+      iconAnchor: [13, 13],
+    });
+
+    window.renderSites = function (sites) {
+      parkLayer.clearLayers();
+      sites.forEach(site => {
+        const marker = L.marker([site.latitude, site.longitude], {
+          icon: telescopeIcon,
+          interactive: true
+        });
+
+        const lp = site.lightPollution;
+
+        const popupHtml = `
+          <div class="space-popup">
+            <h3>${site.name}</h3>
+            <p>${site.description}</p>
+            <b>Light Pollution</b><br/>
+            Zone: <span class="lp-zone">${lp?.lpZone ?? 'N/A'}</span>
+            <span class="lp-color" style="color: ${lp?.colorZone ?? '#fff'};">&#9608;</span><br/>
+            Index: <span>${lp?.lpIndex?.toFixed(3) ?? 'N/A'}</span><br/>
+            mag/arcsec²: <span>${lp?.magArcSec?.toFixed(2) ?? 'N/A'}</span><br/>
+            <button class="popup-btn" onclick='window.ReactNativeWebView && window.ReactNativeWebView.postMessage(JSON.stringify({ type: "siteClick", site: ${JSON.stringify(site.id)} }))'>
+              View Details
+            </button>
+          </div>
+        `;
+        marker.bindPopup(popupHtml);
+        marker.addTo(parkLayer);
+      });
+    };
+  };
+</script>
+</body>
+</html>

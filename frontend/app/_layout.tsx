@@ -8,7 +8,7 @@ export default function Layout() {
       <StatusBar style="auto" />
       <Stack 
         screenOptions={{
-          headerTitleAlign: 'center',
+          headerShown: false,
         }}
       />
     </React.Fragment>

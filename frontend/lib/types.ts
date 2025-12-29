@@ -2,6 +2,7 @@ export type LightPollutionData = {
   lpIndex: number;
   magArcSec: number;
   lpZone: string;
+  colorZone: string;
 };
 
 export type Site = {

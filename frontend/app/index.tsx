@@ -3,7 +3,7 @@ import { useEffect, useState } from 'react';
 import { fetch } from 'expo/fetch';
 import { Site } from '../lib/types';
 import { getLightPollution } from '../lib/lightPollution';
-import { MapWebView } from '../components/MapWebView';
+import { MapWebView } from '../webviews/MapWebView';
 import { useNavigation } from 'expo-router';
 
 const API_URL = process.env.EXPO_PUBLIC_BACKEND_API_URL;

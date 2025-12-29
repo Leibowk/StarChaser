@@ -45,55 +45,54 @@ export async function getLightPollution(
   const magArcSec = 22 - 5 * Math.log(1 + lpIndex) / Math.log(100);
 
   var brightnessRatio = compressed2full(compressed);
-	    
   if (brightnessRatio < 0.01) {
-  var LPzone = '0'
-              var colorzone = 'rgba(  0,  0,  0, 0.8)'
+      var lpZone = '0'
+      var colorZone = 'rgba(  0,  0,  0, 0.8)'
     } else if (brightnessRatio < 0.06) {
-  var LPzone = '1a'
-              var colorzone = 'rgba( 34, 34, 34, 0.7)'
+        var lpZone = '1a'
+        var colorZone = 'rgba( 34, 34, 34, 0.7)'
     } else if (brightnessRatio < 0.11) {
-  var LPzone = '1b'
-              var colorzone = 'rgba( 66, 66, 66, 0.6)'
+        var lpZone = '1b'
+        var colorZone = 'rgba( 66, 66, 66, 0.6)'
     } else if (brightnessRatio < 0.19) {
-  var LPzone = '2a'
-              var colorzone = 'rgba( 20, 47,114, 0.7)'
+        var lpZone = '2a'
+        var colorZone = 'rgba( 20, 47,114, 0.7)'
     } else if (brightnessRatio < 0.33) {
-  var LPzone = '2b'
-              var colorzone = 'rgba( 33, 84,216, 0.6)'
+        var lpZone = '2b'
+        var colorZone = 'rgba( 33, 84,216, 0.6)'
     } else if (brightnessRatio < 0.58) {
-  var LPzone = '3a'
-              var colorzone = 'rgba( 15, 87, 20, 0.7)'
+        var lpZone = '3a'
+        var colorZone = 'rgba( 15, 87, 20, 0.7)'
     } else if (brightnessRatio < 1.00) {
-  var LPzone = '3b'
-              var colorzone = 'rgba( 31,161, 42, 0.6)'
+        var lpZone = '3b'
+        var colorZone = 'rgba( 31,161, 42, 0.6)'
     } else if (brightnessRatio < 1.73) {
-  var LPzone = '4a'
-              var colorzone = 'rgba(110,100, 30, 0.7)'
+        var lpZone = '4a'
+        var colorZone = 'rgba(110,100, 30, 0.7)'
     } else if (brightnessRatio < 3.00) {
-  var LPzone = '4b'
-              var colorzone = 'rgba(184,166, 37, 0.6)'
+        var lpZone = '4b'
+        var colorZone = 'rgba(184,166, 37, 0.6)'
     } else if (brightnessRatio < 5.20) {
-  var LPzone = '5a'
-              var colorzone = 'rgba(191,100, 30, 0.7)'
+        var lpZone = '5a'
+        var colorZone = 'rgba(191,100, 30, 0.7)'
     } else if (brightnessRatio < 9.00) {
-  var LPzone = '5b'
-              var colorzone = 'rgba(253,150, 80, 0.6)'
+        var lpZone = '5b'
+        var colorZone = 'rgba(253,150, 80, 0.6)'
     } else if (brightnessRatio < 15.59) {
-  var LPzone = '6a'
-              var colorzone = 'rgba(251, 90, 73, 0.7)'
+        var lpZone = '6a'
+        var colorZone = 'rgba(251, 90, 73, 0.7)'
     } else if (brightnessRatio < 27.00) {
-  var LPzone = '6b'
-              var colorzone = 'rgba(251,153,138, 0.6)'
+        var lpZone = '6b'
+        var colorZone = 'rgba(251,153,138, 0.6)'
     } else if (brightnessRatio < 46.77) {
-  var LPzone = '7a'
-              var colorzone = 'rgba(160,160,160, 0.7)'
+        var lpZone = '7a'
+        var colorZone = 'rgba(160,160,160, 0.7)'
     } else {
-  var LPzone = '7b'
-              var colorzone = 'rgba(242,242,242, 0.8)'
+        var lpZone = '7b'
+        var colorZone = 'rgba(242,242,242, 0.8)'
     }
 
-  return { lpIndex, magArcSec, lpZone: LPzone };
+  return { lpIndex, magArcSec, lpZone, colorZone };
 }
 
 function compressed2full(x: number) {

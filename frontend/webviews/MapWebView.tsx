@@ -14,7 +14,7 @@ export function MapWebView({ sites }: Props) {
 
   useEffect(() => {
     async function loadHtml() {
-      const asset = Asset.fromModule(require('../assets/map.html'));
+      const asset = Asset.fromModule(require('./map.html'));
       await asset.downloadAsync();
       const text = await (await fetch(asset.uri)).text();
       setHtml(text);
