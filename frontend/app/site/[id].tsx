@@ -58,6 +58,7 @@ useEffect(() => {
         <Text style={styles.label}>Site ID: <Text style={styles.value}>{site.id}</Text></Text>
         <Text style={styles.label}>Description: <Text style={styles.value}>{site.description}</Text></Text>
         <Text style={styles.label}>Latitude: <Text style={styles.value}>{site.latitude}</Text></Text>
+        <Text style={styles.label}>Longitude: <Text style={styles.value}>{site.longitude}</Text></Text>
         <Text style={styles.section}>Light Pollution</Text>
         <Text style={styles.label}>Zone: <Text style={styles.value}>{lightPollution?.lpZone ?? 'N/A'}</Text></Text>
         <Text style={styles.label}>Index: <Text style={styles.value}>{lightPollution?.lpIndex?.toFixed(3) ?? 'N/A'}</Text></Text>
