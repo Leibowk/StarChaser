@@ -1,6 +1,6 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-from repositories.site_repo import SiteRepository
+from services.site_service import SiteService
 from fastapi.staticfiles import StaticFiles
 import os
 
@@ -22,19 +22,16 @@ app.add_middleware(
 )
 
 # Initialize repository
-site_repo = SiteRepository()
+site_service = SiteService()
 
-# Serve your image_tiles folder
+# Serve light pollution tiles
 tiles_path = os.path.join(os.path.dirname(__file__), "image_tiles")
-bi_tiles_path = os.path.join(os.path.dirname(__file__), "binary_tiles")
-
 app.mount("/tiles", StaticFiles(directory=tiles_path), name="tiles")
-app.mount("/bi_tiles", StaticFiles(directory=bi_tiles_path, html=False), name="bi_tiles")
 
 @app.get("/sites")
 def get_sites():
-    return site_repo.get_all_sites()
+    return site_service.get_all_sites()
 
 @app.get("/site/{site_id}")
-def get_site(site_id):
-    return site_repo.get_site(site_id)
+def get_site(site_id: int):
+    return site_service.get_site(site_id)

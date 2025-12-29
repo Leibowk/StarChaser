@@ -6,7 +6,7 @@ export type LightPollutionData = {
 };
 
 export type Site = {
-  id: string;
+  id: number;
   name: string;
   description: string;
   latitude: number;

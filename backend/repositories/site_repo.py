@@ -19,18 +19,7 @@ class SiteRepository:
         )
         result = self.session.execute(query).all()
 
-        sites = []
-        for row in result:
-          sites.append(
-                Site(
-                    id=row.id,
-                    name=row.name,
-                    description=row.description,
-                    latitude=row.latitude,
-                    longitude=row.longitude
-                )
-          )
-        return sites
+        return result
 
     def get_site(self, site_id):
         query = select(
@@ -41,12 +30,4 @@ class SiteRepository:
             func.ST_Y(SiteDB.geom.cast(Geometry)).label("latitude")
         ).where(SiteDB.id == site_id)
         result = self.session.execute(query).first()
-        if result:
-            return Site(
-                id=result.id,
-                name=result.name,
-                description=result.description,
-                latitude=result.latitude,
-                longitude=result.longitude
-            )
-        return None
+        return result

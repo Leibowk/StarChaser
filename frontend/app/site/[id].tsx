@@ -2,7 +2,6 @@ import { View, Text, StyleSheet, ActivityIndicator, ImageBackground } from 'reac
 import { useLocalSearchParams, useNavigation} from 'expo-router';
 import { useEffect, useState } from 'react';
 import { LightPollutionData, Site } from '../../lib/types';
-import { getLightPollution } from '../../lib/lightPollution';
 
 export default function SiteDetailScreen() {
   const API_URL = process.env.EXPO_PUBLIC_BACKEND_API_URL;
@@ -12,7 +11,6 @@ export default function SiteDetailScreen() {
   }
   const { id } = useLocalSearchParams<{ id: string }>();
   const [site, setSite] = useState<Site | null>(null);
-  const [lightPollution, setLightPollution] = useState<LightPollutionData | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const navigation = useNavigation();
@@ -26,13 +24,22 @@ useEffect(() => {
       const res = await fetch(`${API_URL}/site/${id}`);
       if (!res.ok) throw new Error('Failed to fetch site');
       const data = await res.json();
-      setSite(data);
+
+      //small hack for now to fix mappings.
+      const mapped: Site = {
+        ...data,
+        lightPollution: data.light_pollution && {
+          lpIndex: data.light_pollution.lp_index,
+          magArcSec: data.light_pollution.mag_arcsec,
+          lpZone: data.light_pollution.lp_zone,
+          colorZone: data.light_pollution.color_zone,
+        },
+      };
+
+      setSite(mapped);
+
       navigation.setOptions({ title: data.name });
       setError(null);
-
-      // Call getLightPollution after site is fetched
-      const lp = await getLightPollution(data.latitude, data.longitude);
-      setLightPollution(lp);
     } catch (err: any) {
       setError(err.message);
     } finally {
@@ -60,9 +67,9 @@ useEffect(() => {
         <Text style={styles.label}>Latitude: <Text style={styles.value}>{site.latitude}</Text></Text>
         <Text style={styles.label}>Longitude: <Text style={styles.value}>{site.longitude}</Text></Text>
         <Text style={styles.section}>Light Pollution</Text>
-        <Text style={styles.label}>Zone: <Text style={styles.value}>{lightPollution?.lpZone ?? 'N/A'}</Text></Text>
-        <Text style={styles.label}>Index: <Text style={styles.value}>{lightPollution?.lpIndex?.toFixed(3) ?? 'N/A'}</Text></Text>
-        <Text style={styles.label}>mag/arcsec²: <Text style={styles.value}>{lightPollution?.magArcSec?.toFixed(2) ?? 'N/A'}</Text></Text>
+        <Text style={styles.label}>Zone: <Text style={styles.value}>{site?.lightPollution?.lpZone ?? 'N/A'}</Text></Text>
+        <Text style={styles.label}>Index: <Text style={styles.value}>{site?.lightPollution?.lpIndex?.toFixed(3) ?? 'N/A'}</Text></Text>
+        <Text style={styles.label}>mag/arcsec²: <Text style={styles.value}>{site?.lightPollution?.magArcSec?.toFixed(2) ?? 'N/A'}</Text></Text>
       </View>
     </ImageBackground>
   );

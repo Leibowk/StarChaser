@@ -2,7 +2,6 @@ import { View, StyleSheet } from 'react-native';
 import { useEffect, useState } from 'react';
 import { fetch } from 'expo/fetch';
 import { Site } from '../lib/types';
-import { getLightPollution } from '../lib/lightPollution';
 import { MapWebView } from '../webviews/MapWebView';
 import { useNavigation } from 'expo-router';
 
@@ -27,15 +26,24 @@ export default function MapScreen() {
 
         const enriched: Site[] = await Promise.all(
           rawSites.map(async (site: any) => {
-            const lp = await getLightPollution(site.latitude, site.longitude);
+            //small hack for now to fix mappings.
+            const mapped: Site = {
+              ...site,
+              lightPollution: site.light_pollution && {
+                lpIndex: site.light_pollution.lp_index,
+                magArcSec: site.light_pollution.mag_arcsec,
+                lpZone: site.light_pollution.lp_zone,
+                colorZone: site.light_pollution.color_zone,
+              },
+            };
 
             return {
-              id: site.id,
-              name: site.name,
-              description: site.description,
-              latitude: site.latitude,
-              longitude: site.longitude,
-              lightPollution: lp ?? undefined
+              id: mapped.id,
+              name: mapped.name,
+              description: mapped.description,
+              latitude: mapped.latitude,
+              longitude: mapped.longitude,
+              lightPollution: mapped.lightPollution ?? undefined
             };
           })
         );
