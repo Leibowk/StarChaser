@@ -5,7 +5,8 @@ from models.weather import Weather
 
 
 class WeatherService:
-    def __init__(self):
+    def __init__(self, http_client=requests):
+        self.http_client = http_client
         self.base_url = settings.WEATHER.URL
         self.api_key = settings.WEATHER.API_KEY
         self.timeout = 5  # seconds
@@ -21,7 +22,7 @@ class WeatherService:
         }
 
         try:
-            response = requests.get(
+            response = self.http_client.get(
                 self.base_url,
                 params=params,
                 timeout=self.timeout,
@@ -40,6 +41,6 @@ class WeatherService:
                 aqi=air_quality.get("us-epa-index"),
             )
 
-        except requests.RequestException as e:
+        except Exception as e:
             print(f"[WeatherService] Error fetching weather: {e}")
             return None

@@ -1,4 +1,4 @@
-from models.site_db import SiteDB  # your ORM model
+from models.site_db import SiteDB
 from sqlalchemy.orm import Session
 from sqlalchemy import select, func
 from db import SessionLocal

@@ -54,6 +54,16 @@ cd backend/
 uvicorn main:app --host 0.0.0.0 --port 3000 --reload
 ```
 
+Test your backend is setup by navigating to http://192.168.1.18:3000/docs (or whatever the URL is from ipconfig) and hit an endpoint!
+
+## Tests
+StarChaser has a test suite powered with pytest
+
+To run all tests:
+```bash
+cd backend/
+python -m pytest
+```
 
 ## Frontend Setup
 

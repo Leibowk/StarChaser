@@ -1,5 +1,3 @@
-# backend/seeds/seed_sites.py
-
 from db import SessionLocal
 from models.site_db import SiteDB
 from geoalchemy2.shape import from_shape
