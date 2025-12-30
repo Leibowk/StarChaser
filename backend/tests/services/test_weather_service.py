@@ -1,11 +1,11 @@
 import requests
 from services.weather_service import WeatherService
 from models.weather import Weather
-from tests.mocks.http_mocks import FakeResponse, FakeHttpClient
+from tests.mocks.http import ResponseMock, HttpClientMock
 
 class TestWeatherService:
     def test_get_current_weather_success(self):
-        fake_response = FakeResponse({
+        fake_response = ResponseMock({
             "current": {
                 "cloud": 60,
                 "vis_km": 8.5,
@@ -15,7 +15,7 @@ class TestWeatherService:
             }
         })
 
-        http_client = FakeHttpClient(response=fake_response)
+        http_client = HttpClientMock(response=fake_response)
         service = WeatherService(http_client=http_client)
 
         result = service.get_current_weather(48.75, -122.48)
@@ -28,11 +28,11 @@ class TestWeatherService:
         assert result.aqi == 1
 
     def test_get_current_weather_missing_fields(self):
-        fake_response = FakeResponse({
+        fake_response = ResponseMock({
             "current": {}
         })
 
-        http_client = FakeHttpClient(response=fake_response)
+        http_client = HttpClientMock(response=fake_response)
         service = WeatherService(http_client=http_client)
 
         result = service.get_current_weather(0.0, 0.0)
@@ -45,9 +45,9 @@ class TestWeatherService:
         assert result.aqi is None
 
     def test_get_current_weather_http_error(self):
-        fake_response = FakeResponse({}, status_code=500)
+        fake_response = ResponseMock({}, status_code=500)
 
-        http_client = FakeHttpClient(response=fake_response)
+        http_client = HttpClientMock(response=fake_response)
         service = WeatherService(http_client=http_client)
 
         result = service.get_current_weather(48.75, -122.48)
@@ -55,7 +55,7 @@ class TestWeatherService:
         assert result is None
 
     def test_get_current_weather_network_error(self):
-        http_client = FakeHttpClient(should_raise=True)
+        http_client = HttpClientMock(should_raise=True)
         service = WeatherService(http_client=http_client)
 
         result = service.get_current_weather(48.75, -122.48)
@@ -63,8 +63,8 @@ class TestWeatherService:
         assert result is None
 
     def test_weather_request_params(self):
-        fake_response = FakeResponse({"current": {}})
-        http_client = FakeHttpClient(response=fake_response)
+        fake_response = ResponseMock({"current": {}})
+        http_client = HttpClientMock(response=fake_response)
 
         service = WeatherService(http_client=http_client)
         service.get_current_weather(10.5, 20.5)

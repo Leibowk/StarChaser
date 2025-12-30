@@ -1,4 +1,4 @@
-class FakeResponse:
+class ResponseMock:
     def __init__(self, json_data, status_code=200):
         self._json_data = json_data
         self.status_code = status_code
@@ -8,10 +8,10 @@ class FakeResponse:
 
     def raise_for_status(self):
         if self.status_code >= 400:
-            raise FakeHttpClient.RequestException(f"{self.status_code} error")
+            raise HttpClientMock.RequestException(f"{self.status_code} error")
 
 
-class FakeHttpClient:
+class HttpClientMock:
     class RequestException(Exception):
         pass
 
@@ -28,6 +28,6 @@ class FakeHttpClient:
         }
 
         if self.should_raise:
-            raise FakeHttpClient.RequestException("Network error")
+            raise HttpClientMock.RequestException("Network error")
 
         return self.response
