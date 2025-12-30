@@ -2,6 +2,7 @@ from typing import Optional
 from enums.site_visibility import SiteVisibility
 from models.visibility import Visibility
 from repositories.site_repo import SiteRepository
+from services.visibility_service import VisibilityService
 from services.light_pollution_service import LightPollutionService
 from services.weather_service import WeatherService
 from models.site import Site
@@ -12,6 +13,7 @@ class SiteService:
         self.site_repo = SiteRepository()
         self.lp_service = LightPollutionService()
         self.weather_service = WeatherService()
+        self.visibility_service = VisibilityService()
 
     def get_all_sites(self) -> list[SiteSummary]:
         rows = self.site_repo.get_all_sites()
@@ -36,20 +38,14 @@ class SiteService:
         if not r:
             return None
 
-        lp = self.lp_service.get_for_location(r.latitude, r.longitude)
-        weather = self.weather_service.get_current_weather(r.latitude, r.longitude)
+        visibility = self.visibility_service.compute_visibility(r.latitude, r.longitude)
         return Site(
             id=r.id,
             name=r.name,
             description=r.description,
             latitude=r.latitude,
             longitude=r.longitude,
-            visibility= Visibility(
-                score=0, ## Update this
-                category= SiteVisibility.Terrible, ## Update this
-                light_pollution=lp,
-                weather=weather)
-        )
+            visibility=visibility)
 
     def search(
         self,
