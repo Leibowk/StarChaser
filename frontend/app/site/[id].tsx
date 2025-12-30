@@ -25,7 +25,6 @@ useEffect(() => {
       if (!res.ok) throw new Error('Failed to fetch site');
       const data = await res.json();
 
-      //small hack for now to fix mappings.
       const mapped: Site = {
         ...data,
         lightPollution: data.light_pollution && {

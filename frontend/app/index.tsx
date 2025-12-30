@@ -26,7 +26,7 @@ export default function MapScreen() {
 
         const enriched: Site[] = await Promise.all(
           rawSites.map(async (site: any) => {
-            //small hack for now to fix mappings.
+
             const mapped: Site = {
               ...site,
               lightPollution: site.light_pollution && {
