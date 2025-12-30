@@ -52,22 +52,38 @@ class SiteService:
         name: Optional[str] = None,
         lat: Optional[float] = None,
         lon: Optional[float] = None,
-        radius_km: Optional[float] = None) -> list[SiteSummary]:
+        radius_km: Optional[float] = None,
+        site_visib: Optional[SiteVisibility] = None) -> list[SiteSummary]:
 
         rows = self.site_repo.search(name, lat, lon, radius_km)
         
         sites = []
 
         for r in rows:
-            sites.append(
-                SiteSummary(
-                    id=r.id,
-                    name=r.name,
-                    description=r.description,
-                    latitude=r.latitude,
-                    longitude=r.longitude,
-                    light_pollution=None
-                )
-            )
+            if site_visib is not None:
+                visibility = self.visibility_service.compute_visibility(r.latitude, r.longitude)
+                valid = self.visibility_service.meets_visibility_threshold(visibility.score, site_visib)
+                if valid:
+                    sites.append(
+                        SiteSummary(
+                            id=r.id,
+                            name=r.name,
+                            description=r.description,
+                            latitude=r.latitude,
+                            longitude=r.longitude,
+                            light_pollution=visibility.light_pollution
+                        )
+                    )
+            else:
+                sites.append(
+                        SiteSummary(
+                            id=r.id,
+                            name=r.name,
+                            description=r.description,
+                            latitude=r.latitude,
+                            longitude=r.longitude,
+                            light_pollution=visibility.light_pollution
+                        )
+                    )
 
         return sites

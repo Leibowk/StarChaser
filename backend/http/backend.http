@@ -3,6 +3,7 @@
 @long=-122.52
 @radius = 50
 @name=park
+@vis = Ok
 
 ###Get all sites
 GET http://192.168.1.18:3000/sites
@@ -17,5 +18,5 @@ GET http://192.168.1.18:3000/sites/search?name={{name}}
 Accept: application/json
 
 ###Search sites, lat, long, radius
-GET http://192.168.1.18:3000/sites/search?lat={{lat}}&lon={{long}}&radius_km={{radius}}
+GET http://192.168.1.18:3000/sites/search?lat={{lat}}&lon={{long}}&radius_km={{radius}}&site_visib={{vis}}
 Accept: application/json

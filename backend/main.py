@@ -59,4 +59,4 @@ def search(
         None,
         description="Overall site visibility rating",
     )) -> list[SiteSummary]:
-    return site_service.search(name, lat, lon, radius_km)
+    return site_service.search(name, lat, lon, radius_km, site_visib)

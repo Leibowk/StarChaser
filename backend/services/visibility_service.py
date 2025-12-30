@@ -52,3 +52,20 @@ class VisibilityService:
                 return SiteVisibility.Bad
             case _:
                 return SiteVisibility.Terrible
+
+    @staticmethod      
+    def meets_visibility_threshold(score: float, min_category: SiteVisibility) -> bool:
+        """
+        Returns True if the score meets or exceeds the threshold defined by min_category.
+        """
+        thresholds = {
+            SiteVisibility.Perfect: 0.95,
+            SiteVisibility.Great:   0.80,
+            SiteVisibility.Good:    0.60,
+            SiteVisibility.Ok:      0.50,
+            SiteVisibility.Bad:     0.30,
+            SiteVisibility.Terrible:0.0,
+        }
+
+        min_score = thresholds[min_category]
+        return score >= min_score
