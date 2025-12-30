@@ -35,22 +35,32 @@ CREATE DATABASE "StarChaser";
 ```
 
 Migrations and seeding data:
+```
 cd backend
-run "alembic upgrade head"
-run "python -m scripts.seed.seed_sites"
+alembic upgrade head
+python -m scripts.seed.seed_sites
+```
 
 Install backend dependencies:
+```
 pip install -r requirements.txt
+```
+
 Get localsettings.json from another developer and place it in the backend/ directory.
 
 Run Backend:
+```
 cd backend/
 uvicorn main:app --host 0.0.0.0 --port 3000 --reload
+```
+
 
 ## Frontend Setup
 
 Create .env file
+
 run ipconfig
+
 Find the line IPv4 Address. . . . . . . . . . . : 192.168.1.18
 
 Set the backend URL in .env:
@@ -58,9 +68,11 @@ Set the backend URL in .env:
 EXPO_PUBLIC_BACKEND_API_URL=http://192.168.1.18:3000
 
 Run frontend:
-
+```
 cd frontend/
 npx expo start --clear
+```
+
 
 ## Notes
 
