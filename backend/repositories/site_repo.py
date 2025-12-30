@@ -1,5 +1,4 @@
 from models.site_db import SiteDB  # your ORM model
-from models.site import Site       # import your Site type
 from sqlalchemy.orm import Session
 from sqlalchemy import select, func
 from db import SessionLocal
@@ -9,7 +8,7 @@ class SiteRepository:
     def __init__(self):
         self.session = SessionLocal()
 
-    def get_all_sites(self):
+    def get_all_sites(self) -> list[SiteDB]:
         query = select(
             SiteDB.id,
             SiteDB.name,
@@ -21,7 +20,7 @@ class SiteRepository:
 
         return result
 
-    def get_site(self, site_id):
+    def get_site(self, site_id) -> SiteDB:
         query = select(
             SiteDB.id,
             SiteDB.name,

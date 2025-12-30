@@ -10,7 +10,7 @@ class SiteService:
         self.lp_service = LightPollutionService()
         self.weather_service = WeatherService()
 
-    def get_all_sites(self):
+    def get_all_sites(self) -> list[SiteSummary]:
         rows = self.site_repo.get_all_sites()
         sites = []
 
@@ -28,7 +28,7 @@ class SiteService:
             )
         return sites
 
-    def get_site(self, site_id: int):
+    def get_site(self, site_id: int) -> Site:
         r = self.site_repo.get_site(site_id)
         if not r:
             return None

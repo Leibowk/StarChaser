@@ -2,6 +2,8 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from services.site_service import SiteService
 from fastapi.staticfiles import StaticFiles
+from models.site import Site
+from models.site_summary import SiteSummary
 import os
 
 app = FastAPI()
@@ -28,10 +30,10 @@ site_service = SiteService()
 tiles_path = os.path.join(os.path.dirname(__file__), "image_tiles")
 app.mount("/tiles", StaticFiles(directory=tiles_path), name="tiles")
 
-@app.get("/sites")
-def get_sites():
+@app.get("/sites", response_model=list[SiteSummary])
+def get_sites() -> list[SiteSummary]:
     return site_service.get_all_sites()
 
-@app.get("/site/{site_id}")
-def get_site(site_id: int):
+@app.get("/site/{site_id}", response_model=Site)
+def get_site(site_id: int) -> Site:
     return site_service.get_site(site_id)

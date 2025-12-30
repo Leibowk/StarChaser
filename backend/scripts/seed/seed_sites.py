@@ -5,7 +5,7 @@ from models.site_db import SiteDB
 from geoalchemy2.shape import from_shape
 from shapely.geometry import Point
 
-def seed_sites():
+def seed_sites() -> None:
     session = SessionLocal()
 
     # Prevent duplicate seeding
