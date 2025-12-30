@@ -1,43 +1,75 @@
-# **Welcome to StarChaser!!!**
+# StarChaser 🌌
 
-Frontend:
-React Native Expo
+StarChaser is a full-stack application built with a React Native Expo frontend and a FastAPI backend, backed by PostgreSQL + PostGIS.
 
-Backend:
-Fast API
+## Tech Stack
 
-DB:
-PostgreSQL and PostgreGIS
+Frontend  
+- React Native  
+- Expo  
+
+Backend  
+- FastAPI  
+- Uvicorn  
+
+Database  
+- PostgreSQL  
+- PostGIS  
+
+## Prerequisites
+
+- Node.js + npm  
+- Python 3.10+  
+- PostgreSQL with PostGIS enabled  
+- uvicorn  
+- Expo Go (mobile app or emulator)  
+
+## Database Setup
+
+Install PostgreSQL (Windows):  
 https://www.postgresql.org/download/windows/
+
+Create the database:
+```sql
 CREATE DATABASE "StarChaser";
+```
+
+Migrations and seeding data:
 cd backend
 run "alembic upgrade head"
 run "python -m scripts.seed.seed_sites"
 
-PreReques:
-uvicorn
+Install backend dependencies:
+pip install -r requirements.txt
+Get localsettings.json from another developer and place it in the backend/ directory.
+
+Run Backend:
+cd backend/
+uvicorn main:app --host 0.0.0.0 --port 3000 --reload
+
+## Frontend Setup
 
 Create .env file
 run ipconfig
 Find the line IPv4 Address. . . . . . . . . . . : 192.168.1.18
-set variable EXPO_PUBLIC_BACKEND_API_URL=http://192.168.1.18:3000 
 
-Get a localsetting.json from another dev and put it into the backend folder
+Set the backend URL in .env:
 
-Start app: 
+EXPO_PUBLIC_BACKEND_API_URL=http://192.168.1.18:3000
+
+Run frontend:
+
 cd frontend/
 npx expo start --clear
 
-Run Backend:
-cd backend/
-pip install -r requirements.txt
-uvicorn main:app --host 0.0.0.0 --port 3000 --reload
+## Notes
 
 Can either run frontend on Expo Go from your phone or download an emulator like BlueStacks and use Expo Go there.
 
-For now need to be on the same Network as me :)
+
+## Troubleshooting
 
 If getting an errror w/ network
 re-run ipconfig and update .env file
 
-
+For now need to be on the same Network as me :)
