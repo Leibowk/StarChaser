@@ -26,17 +26,6 @@ useEffect(() => {
       const res = await fetch(`${API_URL}/site/${id}`);
       if (!res.ok) throw new Error('Failed to fetch site');
       const data = await res.json();
-
-      // const mapped: Site = {
-      //   ...data,
-      //   lightPollution: data.light_pollution && {
-      //     lpIndex: data.light_pollution.lp_index,
-      //     magArcSec: data.light_pollution.mag_arcsec,
-      //     lpZone: data.light_pollution.lp_zone,
-      //     colorZone: data.light_pollution.color_zone,
-      //   },
-      // };
-
       setSite(mapApiSiteToSite(data));
 
       navigation.setOptions({ title: data.name });
@@ -63,27 +52,35 @@ useEffect(() => {
     >
       <View style={styles.overlay}>
         <Text style={styles.title}>{site.name}</Text>
+        <Text style={styles.section}>Site Visibility</Text>
+        <Text style={styles.label}>
+          Conditions: <Text style={styles.value}>{site?.visibility?.category ?? 'N/A'}</Text>
+        </Text>
+        <Text style={styles.label}>
+          Score: <Text style={styles.value}>{site?.visibility?.score ?? 'N/A'}</Text>
+        </Text>
+        <Text style={styles.section}>Light Pollution</Text>
+        <Text style={styles.label}>Zone: <Text style={styles.value}>{site?.visibility?.lightPollution?.lpZone ?? 'N/A'}</Text></Text>
+        <Text style={styles.label}>Index: <Text style={styles.value}>{site?.visibility?.lightPollution?.lpIndex?.toFixed(3) ?? 'N/A'}</Text></Text>
+        <Text style={styles.label}>mag/arcsec²: <Text style={styles.value}>{site?.visibility?.lightPollution?.magArcSec?.toFixed(2) ?? 'N/A'}</Text></Text>
+        <Text style={styles.section}>Current Weather</Text>
+        <Text style={styles.label}>
+          Condition: <Text style={styles.value}>{site?.visibility?.weather?.condition ?? 'N/A'}</Text>
+        </Text>
+        <Text style={styles.label}>
+          Cloud Coverage: <Text style={styles.value}>{site?.visibility?.weather?.cloudCoverage ?? 'N/A'}%</Text>
+        </Text>
+        <Text style={styles.label}>
+          Visibility: <Text style={styles.value}>{site?.visibility?.weather?.avgvisKm ?? 'N/A'} km / {site?.visibility?.weather?.avgvisMiles ?? 'N/A'} miles</Text>
+        </Text>
+        <Text style={styles.label}>
+          AQI: <Text style={styles.value}>{site?.visibility?.weather?.aqi ?? 'N/A'}</Text>
+        </Text>
+        <Text style={styles.section}>Site Information</Text>
         <Text style={styles.label}>Site ID: <Text style={styles.value}>{site.id}</Text></Text>
         <Text style={styles.label}>Description: <Text style={styles.value}>{site.description}</Text></Text>
         <Text style={styles.label}>Latitude: <Text style={styles.value}>{site.latitude}</Text></Text>
         <Text style={styles.label}>Longitude: <Text style={styles.value}>{site.longitude}</Text></Text>
-        <Text style={styles.section}>Light Pollution</Text>
-        <Text style={styles.label}>Zone: <Text style={styles.value}>{site?.lightPollution?.lpZone ?? 'N/A'}</Text></Text>
-        <Text style={styles.label}>Index: <Text style={styles.value}>{site?.lightPollution?.lpIndex?.toFixed(3) ?? 'N/A'}</Text></Text>
-        <Text style={styles.label}>mag/arcsec²: <Text style={styles.value}>{site?.lightPollution?.magArcSec?.toFixed(2) ?? 'N/A'}</Text></Text>
-        <Text style={styles.section}>Current Weather</Text>
-        <Text style={styles.label}>
-          Condition: <Text style={styles.value}>{site?.weather?.condition ?? 'N/A'}</Text>
-        </Text>
-        <Text style={styles.label}>
-          Cloud Coverage: <Text style={styles.value}>{site?.weather?.cloudCoverage ?? 'N/A'}%</Text>
-        </Text>
-        <Text style={styles.label}>
-          Visibility: <Text style={styles.value}>{site?.weather?.avgvisKm ?? 'N/A'} km / {site?.weather?.avgvisMiles ?? 'N/A'} miles</Text>
-        </Text>
-        <Text style={styles.label}>
-          AQI: <Text style={styles.value}>{site?.weather?.aqi ?? 'N/A'}</Text>
-        </Text>
       </View>
     </ImageBackground>
   );

@@ -1,4 +1,6 @@
 from typing import Optional
+from enums.site_visibility import SiteVisibility
+from models.visibility import Visibility
 from repositories.site_repo import SiteRepository
 from services.light_pollution_service import LightPollutionService
 from services.weather_service import WeatherService
@@ -42,8 +44,11 @@ class SiteService:
             description=r.description,
             latitude=r.latitude,
             longitude=r.longitude,
-            light_pollution=lp,
-            weather=weather
+            visibility= Visibility(
+                score=0, ## Update this
+                category= SiteVisibility.Terrible, ## Update this
+                light_pollution=lp,
+                weather=weather)
         )
 
     def search(

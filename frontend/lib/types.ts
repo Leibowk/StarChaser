@@ -4,9 +4,24 @@ export type Site = {
   description: string;
   latitude: number;
   longitude: number;
+  visibility?: Visibility;
+};
+
+export type SiteSummary = {
+  id: number;
+  name: string;
+  description: string;
+  latitude: number;
+  longitude: number;
+  lightPollution?: LightPollutionData;
+};
+
+export type Visibility = {
+  score: number;
+  category: string;
   lightPollution?: LightPollutionData;
   weather?: WeatherData;
-};
+}
 
 export type LightPollutionData = {
   lpIndex: number;

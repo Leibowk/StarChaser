@@ -4,7 +4,7 @@ import { fetch } from 'expo/fetch';
 import { Site } from '../lib/types';
 import { MapWebView } from '../webviews/MapWebView';
 import { useNavigation } from 'expo-router';
-import { mapApiSiteToSite } from '../lib/typeMapper';
+import { mapApiSiteToSiteSummary } from '../lib/typeMapper';
 
 const API_URL = process.env.EXPO_PUBLIC_BACKEND_API_URL;
 
@@ -28,7 +28,7 @@ export default function MapScreen() {
         const enriched: Site[] = await Promise.all(
           rawSites.map(async (site: any) => {
 
-            var mapped = mapApiSiteToSite(site);
+            var mapped = mapApiSiteToSiteSummary(site);
 
             return {
               id: mapped.id,
