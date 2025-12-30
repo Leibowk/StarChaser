@@ -1,0 +1,3 @@
+### Get current weather for Whatcom County, WA
+GET http://api.weatherapi.com/v1/current.json?key=YOUR_API_KEY&q=48.75,-122.52&aqi=yes
+Accept: application/json

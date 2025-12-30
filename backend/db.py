@@ -3,9 +3,9 @@ from sqlalchemy.orm import sessionmaker, declarative_base
 from config import settings
 
 DATABASE_URL = (
-    f"postgresql+psycopg2://{settings.POSTGRES_USER}:"
-    f"{settings.POSTGRES_PASSWORD}@{settings.POSTGRES_HOST}:"
-    f"{settings.POSTGRES_PORT}/{settings.POSTGRES_DB}"
+    f"postgresql+psycopg2://{settings.POSTGRES.USER}:"
+    f"{settings.POSTGRES.PASSWORD}@{settings.POSTGRES.HOST}:"
+    f"{settings.POSTGRES.PORT}/{settings.POSTGRES.DB}"
 )
 
 engine = create_engine(DATABASE_URL, echo=True)

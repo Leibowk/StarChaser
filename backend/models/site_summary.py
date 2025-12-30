@@ -1,13 +1,11 @@
 from pydantic import BaseModel
 from typing import Optional
 from models.light_pollution import LightPollution
-from models.weather import Weather
 
-class Site(BaseModel):
+class SiteSummary(BaseModel):
     id: int
     latitude: float
     longitude: float
     name: str
     description: str
     light_pollution: Optional[LightPollution]
-    weather: Optional[Weather]

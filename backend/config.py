@@ -1,14 +1,26 @@
 import json
 from pydantic_settings import BaseSettings
+from pydantic import BaseModel
+
+
+class PostgresSettings(BaseModel):
+    USER: str
+    PASSWORD: str
+    HOST: str
+    PORT: int = 5432
+    DB: str
+
+
+class WeatherSettings(BaseModel):
+    URL: str
+    API_KEY: str
+
 
 class Settings(BaseSettings):
-    POSTGRES_USER: str
-    POSTGRES_PASSWORD: str
-    POSTGRES_HOST: str
-    POSTGRES_PORT: int = 5432
-    POSTGRES_DB: str
+    POSTGRES: PostgresSettings
+    WEATHER: WeatherSettings
 
-# load your JSON manually
+
 with open("localsettings.json") as f:
     data = json.load(f)
 
