@@ -19,7 +19,6 @@ export default function MapScreen() {
   
 
   useEffect(() => {
-    navigation.setOptions({ title: 'StarChaser' });
     async function load() {
       try {
         const response = await fetch(`${API_URL}/sites`);

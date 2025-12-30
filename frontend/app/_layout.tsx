@@ -8,6 +8,7 @@ export default function Layout() {
       <StatusBar style="auto" />
       <Stack 
         screenOptions={{
+          title: '',
           headerTitleAlign: 'center',
           headerTintColor: '#ffd700',
           headerTransparent: true,

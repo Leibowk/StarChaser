@@ -1,6 +1,7 @@
 from typing import Optional
-from fastapi import FastAPI
+from fastapi import FastAPI, Query
 from fastapi.middleware.cors import CORSMiddleware
+from enums.site_visibility import SiteVisibility
 from services.site_service import SiteService
 from fastapi.staticfiles import StaticFiles
 from models.site import Site
@@ -39,10 +40,23 @@ def get_sites() -> list[SiteSummary]:
 def get_site(site_id: int) -> Site:
     return site_service.get_site(site_id)
 
-@app.get("/sites/search", response_model=list[SiteSummary])
+@app.get(
+        "/sites/search", 
+        response_model=list[SiteSummary],
+        summary="Search observation sites",
+        description=(
+            "Search sites by name and/or proximity.\n\n"
+            "- `name`: substring match on site name\n"
+            "- `lat`, `lon`, `radius_km`: return sites within a radius\n"
+            "- Parameters may be combined (AND logic)"
+        ))
 def search(
     name: Optional[str] = None,
     lat: Optional[float] = None,
     lon: Optional[float] = None,
-    radius_km: Optional[float] = None) -> list[SiteSummary]:
+    radius_km: Optional[float] = None,
+    site_visib: Optional[SiteVisibility] = Query(
+        None,
+        description="Overall site visibility rating",
+    )) -> list[SiteSummary]:
     return site_service.search(name, lat, lon, radius_km)
