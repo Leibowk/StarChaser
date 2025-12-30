@@ -1,7 +1,9 @@
 import { View, Text, StyleSheet, ActivityIndicator, ImageBackground } from 'react-native';
 import { useLocalSearchParams, useNavigation} from 'expo-router';
 import { useEffect, useState } from 'react';
-import { LightPollutionData, Site } from '../../lib/types';
+import { Site } from '../../lib/types';
+import { mapApiSiteToSite } from '../../lib/typeMapper';
+
 
 export default function SiteDetailScreen() {
   const API_URL = process.env.EXPO_PUBLIC_BACKEND_API_URL;
@@ -25,17 +27,17 @@ useEffect(() => {
       if (!res.ok) throw new Error('Failed to fetch site');
       const data = await res.json();
 
-      const mapped: Site = {
-        ...data,
-        lightPollution: data.light_pollution && {
-          lpIndex: data.light_pollution.lp_index,
-          magArcSec: data.light_pollution.mag_arcsec,
-          lpZone: data.light_pollution.lp_zone,
-          colorZone: data.light_pollution.color_zone,
-        },
-      };
+      // const mapped: Site = {
+      //   ...data,
+      //   lightPollution: data.light_pollution && {
+      //     lpIndex: data.light_pollution.lp_index,
+      //     magArcSec: data.light_pollution.mag_arcsec,
+      //     lpZone: data.light_pollution.lp_zone,
+      //     colorZone: data.light_pollution.color_zone,
+      //   },
+      // };
 
-      setSite(mapped);
+      setSite(mapApiSiteToSite(data));
 
       navigation.setOptions({ title: data.name });
       setError(null);
@@ -69,6 +71,19 @@ useEffect(() => {
         <Text style={styles.label}>Zone: <Text style={styles.value}>{site?.lightPollution?.lpZone ?? 'N/A'}</Text></Text>
         <Text style={styles.label}>Index: <Text style={styles.value}>{site?.lightPollution?.lpIndex?.toFixed(3) ?? 'N/A'}</Text></Text>
         <Text style={styles.label}>mag/arcsec²: <Text style={styles.value}>{site?.lightPollution?.magArcSec?.toFixed(2) ?? 'N/A'}</Text></Text>
+        <Text style={styles.section}>Current Weather</Text>
+        <Text style={styles.label}>
+          Condition: <Text style={styles.value}>{site?.weather?.condition ?? 'N/A'}</Text>
+        </Text>
+        <Text style={styles.label}>
+          Cloud Coverage: <Text style={styles.value}>{site?.weather?.cloudCoverage ?? 'N/A'}%</Text>
+        </Text>
+        <Text style={styles.label}>
+          Visibility: <Text style={styles.value}>{site?.weather?.avgvisKm ?? 'N/A'} km / {site?.weather?.avgvisMiles ?? 'N/A'} miles</Text>
+        </Text>
+        <Text style={styles.label}>
+          AQI: <Text style={styles.value}>{site?.weather?.aqi ?? 'N/A'}</Text>
+        </Text>
       </View>
     </ImageBackground>
   );

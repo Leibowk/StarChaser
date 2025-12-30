@@ -4,6 +4,7 @@ import { fetch } from 'expo/fetch';
 import { Site } from '../lib/types';
 import { MapWebView } from '../webviews/MapWebView';
 import { useNavigation } from 'expo-router';
+import { mapApiSiteToSite } from '../lib/typeMapper';
 
 const API_URL = process.env.EXPO_PUBLIC_BACKEND_API_URL;
 
@@ -27,15 +28,7 @@ export default function MapScreen() {
         const enriched: Site[] = await Promise.all(
           rawSites.map(async (site: any) => {
 
-            const mapped: Site = {
-              ...site,
-              lightPollution: site.light_pollution && {
-                lpIndex: site.light_pollution.lp_index,
-                magArcSec: site.light_pollution.mag_arcsec,
-                lpZone: site.light_pollution.lp_zone,
-                colorZone: site.light_pollution.color_zone,
-              },
-            };
+            var mapped = mapApiSiteToSite(site);
 
             return {
               id: mapped.id,
