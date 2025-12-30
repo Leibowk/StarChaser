@@ -1,0 +1,21 @@
+@siteId=1
+@lat=48.75
+@long=-122.52
+@radius = 50
+@name=park
+
+###Get all sites
+GET http://192.168.1.18:3000/sites
+Accept: application/json
+
+###Get one site
+GET http://192.168.1.18:3000/site/{{siteId}}
+Accept: application/json
+
+###Search sites name
+GET http://192.168.1.18:3000/sites/search?name={{name}}
+Accept: application/json
+
+###Search sites, lat, long, radius
+GET http://192.168.1.18:3000/sites/search?lat={{lat}}&lon={{long}}&radius_km={{radius}}
+Accept: application/json

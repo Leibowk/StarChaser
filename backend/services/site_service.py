@@ -1,3 +1,4 @@
+from typing import Optional
 from repositories.site_repo import SiteRepository
 from services.light_pollution_service import LightPollutionService
 from services.weather_service import WeatherService
@@ -44,3 +45,28 @@ class SiteService:
             light_pollution=lp,
             weather=weather
         )
+
+    def search(
+        self,
+        name: Optional[str] = None,
+        lat: Optional[float] = None,
+        lon: Optional[float] = None,
+        radius_km: Optional[float] = None) -> list[SiteSummary]:
+
+        rows = self.site_repo.search(name, lat, lon, radius_km)
+        
+        sites = []
+
+        for r in rows:
+            sites.append(
+                SiteSummary(
+                    id=r.id,
+                    name=r.name,
+                    description=r.description,
+                    latitude=r.latitude,
+                    longitude=r.longitude,
+                    light_pollution=None
+                )
+            )
+
+        return sites

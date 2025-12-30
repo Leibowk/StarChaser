@@ -1,3 +1,4 @@
+from typing import Optional
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from services.site_service import SiteService
@@ -37,3 +38,11 @@ def get_sites() -> list[SiteSummary]:
 @app.get("/site/{site_id}", response_model=Site)
 def get_site(site_id: int) -> Site:
     return site_service.get_site(site_id)
+
+@app.get("/sites/search", response_model=list[SiteSummary])
+def search(
+    name: Optional[str] = None,
+    lat: Optional[float] = None,
+    lon: Optional[float] = None,
+    radius_km: Optional[float] = None) -> list[SiteSummary]:
+    return site_service.search(name, lat, lon, radius_km)

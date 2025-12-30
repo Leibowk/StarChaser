@@ -94,4 +94,4 @@ Can either run frontend on Expo Go from your phone or download an emulator like 
 If getting an errror w/ network
 re-run ipconfig and update .env file
 
-For now need to be on the same Network as me :)
+Your phone needs to be connected to your wifi (running on the same network)
