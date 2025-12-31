@@ -36,7 +36,7 @@ class VisibilityService:
         score = 1-lp_factor - cloud_factor - aqi
         if score < 0:
             score = 0
-        return score
+        return score*100
     
     @staticmethod
     def aqi_factor(aqi: float) -> float:
@@ -56,15 +56,17 @@ class VisibilityService:
     @staticmethod
     def category_from_score(score: float) -> SiteVisibility:
         match score:
-            case s if s >= 0.95:
+            case s if s >= 99:
                 return SiteVisibility.Perfect
-            case s if s >= 0.80:
+            case s if s >= 90:
+                return SiteVisibility.Amazing
+            case s if s >= 80:
                 return SiteVisibility.Great
-            case s if s >= 0.60:
+            case s if s >= 60:
                 return SiteVisibility.Good
-            case s if s >= 0.50:
+            case s if s >= 50:
                 return SiteVisibility.Ok
-            case s if s >= 0.30:
+            case s if s >= 30:
                 return SiteVisibility.Bad
             case _:
                 return SiteVisibility.Terrible
@@ -75,11 +77,12 @@ class VisibilityService:
         Returns True if the score meets or exceeds the threshold defined by min_category.
         """
         thresholds = {
-            SiteVisibility.Perfect: 0.95,
-            SiteVisibility.Great:   0.80,
-            SiteVisibility.Good:    0.60,
-            SiteVisibility.Ok:      0.50,
-            SiteVisibility.Bad:     0.30,
+            SiteVisibility.Perfect: 99,
+            SiteVisibility.Amazing: 90,
+            SiteVisibility.Great:   80,
+            SiteVisibility.Good:    60,
+            SiteVisibility.Ok:      50,
+            SiteVisibility.Bad:     30,
             SiteVisibility.Terrible:0.0,
         }
 

@@ -3,7 +3,7 @@
 @long=-122.52
 @radius = 1000
 @name=park
-@vis = Terrible
+@vis = Great
 
 ###Get all sites
 GET http://192.168.1.18:3000/sites
