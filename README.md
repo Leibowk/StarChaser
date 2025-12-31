@@ -95,3 +95,28 @@ If getting an errror w/ network
 re-run ipconfig and update .env file
 
 Your phone needs to be connected to your wifi (running on the same network)
+
+To debug add a launch.json in the .vscode folder. Then simply set break points and debug!
+```json
+{
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "name": "FastAPI (uvicorn)",
+      "type": "python",
+      "request": "launch",
+      "module": "uvicorn",
+      "cwd": "${workspaceFolder}/backend",
+      "args": [
+        "main:app",
+        "--host",
+        "0.0.0.0",
+        "--port",
+        "3000",
+        "--reload"
+      ],
+      "console": "integratedTerminal"
+    }
+  ]
+}
+```
