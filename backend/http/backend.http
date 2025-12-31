@@ -1,9 +1,9 @@
-@siteId=1
+@siteId=3
 @lat=48.75
 @long=-122.52
-@radius = 50
+@radius = 1000
 @name=park
-@vis = Ok
+@vis = Terrible
 
 ###Get all sites
 GET http://192.168.1.18:3000/sites

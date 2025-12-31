@@ -1,5 +1,7 @@
 
 
+from models.light_pollution import LightPollution
+from models.weather import Weather
 from enums.site_visibility import SiteVisibility
 from models.visibility import Visibility
 from services.light_pollution_service import LightPollutionService
@@ -15,18 +17,8 @@ class VisibilityService:
 
         lp = self.lp_service.get_for_location(lat, long)
         weather = self.weather_service.get_current_weather(lat, long)
-        # Default assumptions if data missing
-        lp_score = 1.0
-        cloud_score = 1.0
-
-        if lp:
-            # assume lp.lp_index where higher = worse
-            lp_score = max(0.0, 1.0 - min(lp.lp_index / 5.0, 1.0))
-
-        if weather:
-            cloud_score = max(0.0, 1.0 - weather.cloud_coverage / 100.0)
-
-        score = round(0.7 * lp_score + 0.3 * cloud_score, 3)
+        
+        score = self.compute_score(lp, weather)
 
         category = self.category_from_score(score)
 
@@ -37,6 +29,30 @@ class VisibilityService:
             weather=weather,
         )
     
+    def compute_score(self, lp: LightPollution, weather: Weather):
+        lp_factor = lp.lp_index/47
+        cloud_factor = weather.cloud_coverage/100
+        aqi = 1-self.aqi_factor(weather.aqi)
+        score = 1-lp_factor - cloud_factor - aqi
+        if score < 0:
+            score = 0
+        return score
+    
+    @staticmethod
+    def aqi_factor(aqi: float) -> float:
+        if aqi <= 50:
+            return 1.0
+        elif aqi <= 100:
+            return 0.8
+        elif aqi <= 150:
+            return 0.6
+        elif aqi <= 200:
+            return 0.3
+        elif aqi <= 300:
+            return 0.1
+        else:
+            return 0.0
+        
     @staticmethod
     def category_from_score(score: float) -> SiteVisibility:
         match score:

@@ -42,7 +42,7 @@ def get_site(site_id: int) -> Site:
 
 @app.get(
         "/sites/search", 
-        response_model=list[SiteSummary],
+        response_model=list[Site],
         summary="Search observation sites",
         description=(
             "Search sites by name and/or proximity.\n\n"
@@ -58,5 +58,5 @@ def search(
     site_visib: Optional[SiteVisibility] = Query(
         None,
         description="Overall site visibility rating",
-    )) -> list[SiteSummary]:
+    )) -> list[Site]:
     return site_service.search(name, lat, lon, radius_km, site_visib)

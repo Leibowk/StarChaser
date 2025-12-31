@@ -53,7 +53,7 @@ class SiteService:
         lat: Optional[float] = None,
         lon: Optional[float] = None,
         radius_km: Optional[float] = None,
-        site_visib: Optional[SiteVisibility] = None) -> list[SiteSummary]:
+        site_visib: Optional[SiteVisibility] = None) -> list[Site]:
 
         rows = self.site_repo.search(name, lat, lon, radius_km)
         
@@ -65,24 +65,24 @@ class SiteService:
                 valid = self.visibility_service.meets_visibility_threshold(visibility.score, site_visib)
                 if valid:
                     sites.append(
-                        SiteSummary(
+                        Site(
                             id=r.id,
                             name=r.name,
                             description=r.description,
                             latitude=r.latitude,
                             longitude=r.longitude,
-                            light_pollution=visibility.light_pollution
+                            visibility=visibility
                         )
                     )
             else:
                 sites.append(
-                        SiteSummary(
+                        Site(
                             id=r.id,
                             name=r.name,
                             description=r.description,
                             latitude=r.latitude,
                             longitude=r.longitude,
-                            light_pollution=visibility.light_pollution
+                            visibility=None
                         )
                     )
 
