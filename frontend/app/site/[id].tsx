@@ -9,9 +9,9 @@ import {
 import { useLocalSearchParams, useNavigation} from 'expo-router';
 import { useEffect, useState } from 'react';
 import { Site } from '../../lib/types';
-import { mapApiSiteToSite } from '../../lib/typeMapper';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import apiFetch from '../../lib/api';
+import { mapApiSiteToSite } from '../../lib/typeMapper';
 
 
 

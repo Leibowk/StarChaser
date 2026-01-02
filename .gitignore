@@ -17,8 +17,8 @@ localsettings.json
 
 .vscode/
 
-package.json
-package-lock.json
+/package.json
+/package-lock.json
 
 # Native
 .kotlin/
