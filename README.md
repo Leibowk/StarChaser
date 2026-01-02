@@ -83,6 +83,19 @@ cd frontend/
 npx expo start --clear
 ```
 
+## "Prod" Notes
+GoDaddy -> thestarchaser.com
+
+Cloudflare -> URL redirection
+
+Run "npm run dev"
+
+Get package.json from dev to run. Requires setting up cloudflare.
+
+To access website:
+Download expo go.
+enter in url: exp://ya5evyg-anonymous-8081.exp.direct
+Enjoy!
 
 ## Notes
 
