@@ -6,12 +6,10 @@ class APIKeyMiddleware(BaseHTTPMiddleware):
         super().__init__(app)
         self.api_key = api_key
 
-    async def __call__(self, scope, receive, send):
-        if scope["type"] == "http" and scope["path"].startswith("/tiles"):
-            await self.app(scope, receive, send)
-            return
-        
     async def dispatch(self, request: Request, call_next):
+        if request.url.path.startswith("/tiles"):
+            return await call_next(request)
+        
         key = request.headers.get("x-api-key") or request.query_params.get("api_key")
         if key != self.api_key:
             raise HTTPException(
