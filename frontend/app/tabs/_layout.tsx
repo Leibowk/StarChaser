@@ -7,7 +7,14 @@ export default function Layout() {
   return (
     <React.Fragment>
       <StatusBar style="auto" />
-      <Tabs>
+      <Tabs
+        screenOptions={{
+          headerShown: false,
+          tabBarActiveTintColor: '#ffd700',
+          tabBarInactiveTintColor: '#888',
+          tabBarStyle: { backgroundColor: '#232946', borderTopWidth: 0 },
+        }}
+      >
         <Tabs.Screen
           name="map"
           options={{
