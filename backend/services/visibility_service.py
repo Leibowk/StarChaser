@@ -30,10 +30,11 @@ class VisibilityService:
         )
     
     def compute_score(self, lp: LightPollution, weather: Weather):
+        vis_distance = 1-weather.avgvis_km/40
         lp_factor = lp.lp_index/47
         cloud_factor = weather.cloud_coverage/100
         aqi = 1-self.aqi_factor(weather.aqi)
-        score = 1-lp_factor - cloud_factor - aqi
+        score = 1-lp_factor - cloud_factor - aqi - vis_distance
         if score < 0:
             score = 0
         return score*100
