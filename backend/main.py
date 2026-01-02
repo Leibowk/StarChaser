@@ -37,8 +37,8 @@ app.add_middleware(
 site_service = SiteService()
 
 # Serve light pollution tiles
-tiles_path = os.path.join(os.path.dirname(__file__), "image_tiles")
-app.mount("/tiles", StaticFiles(directory=tiles_path), name="tiles")
+tiles_dir = os.path.join(os.path.dirname(__file__), "image_tiles")
+app.mount("/tiles", StaticFiles(directory=tiles_dir), name="tiles")
 
 @app.get("/sites", response_model=list[SiteSummary])
 def get_sites() -> list[SiteSummary]:
