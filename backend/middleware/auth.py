@@ -7,7 +7,7 @@ class APIKeyMiddleware(BaseHTTPMiddleware):
         self.api_key = api_key
 
     async def dispatch(self, request: Request, call_next):
-        if request.url.path.startswith("/tiles"):
+        if request.url.path.startswith(("/tiles", "/docs", "/openapi.json")):
             return await call_next(request)
         
         key = request.headers.get("x-api-key") or request.query_params.get("api_key")
