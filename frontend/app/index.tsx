@@ -5,12 +5,7 @@ import { Site } from '../lib/types';
 import { MapWebView } from '../webviews/MapWebView';
 import { useNavigation } from 'expo-router';
 import { mapApiSiteToSiteSummary } from '../lib/typeMapper';
-
-const API_URL = process.env.EXPO_PUBLIC_BACKEND_API_URL;
-
-if (!API_URL) {
-  throw new Error('EXPO_PUBLIC_BACKEND_API_URL is not set');
-}
+import apiFetch from '../lib/api';
 
 export default function MapScreen() {
   const [sites, setSites] = useState<Site[]>([]);
@@ -21,9 +16,7 @@ export default function MapScreen() {
   useEffect(() => {
     async function load() {
       try {
-        const response = await fetch(`${API_URL}/sites`);
-        const rawSites = await response.json();
-
+        const rawSites = await apiFetch('/sites');
         const enriched: Site[] = await Promise.all(
           rawSites.map(async (site: any) => {
 

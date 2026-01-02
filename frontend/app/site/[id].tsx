@@ -11,15 +11,11 @@ import { useEffect, useState } from 'react';
 import { Site } from '../../lib/types';
 import { mapApiSiteToSite } from '../../lib/typeMapper';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import apiFetch from '../../lib/api';
 
 
 
 export default function SiteDetailScreen() {
-  const API_URL = process.env.EXPO_PUBLIC_BACKEND_API_URL;
-
-  if (!API_URL) {
-    throw new Error('EXPO_PUBLIC_BACKEND_API_URL is not set');
-  }
   const { id } = useLocalSearchParams<{ id: string }>();
   const [site, setSite] = useState<Site | null>(null);
   const [loading, setLoading] = useState(true);
@@ -32,9 +28,7 @@ useEffect(() => {
     if (!id) return;
     setLoading(true);
     try {
-      const res = await fetch(`${API_URL}/site/${id}`);
-      if (!res.ok) throw new Error('Failed to fetch site');
-      const data = await res.json();
+      const data = await apiFetch(`/site/${id}`);
       setSite(mapApiSiteToSite(data));
       setError(null);
     } catch (err: any) {
