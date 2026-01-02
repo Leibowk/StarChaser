@@ -1,6 +1,6 @@
 // SearchPanel.tsx
 import React, { useState, useEffect } from 'react';
-import { View, TextInput, Text, Button, StyleSheet, Alert } from 'react-native';
+import { View, TextInput, Text, Button, StyleSheet, Alert, StatusBar } from 'react-native';
 import { Picker } from '@react-native-picker/picker';
 import * as Location from 'expo-location';
 
@@ -120,7 +120,7 @@ export const SearchPanel = ({ onSearch }: Props) => {
 };
 
 const styles = StyleSheet.create({
-  container: { padding: 16, backgroundColor: '#fff' },
+  container: { padding: 16, backgroundColor: '#fff', paddingTop: StatusBar.currentHeight ? StatusBar.currentHeight + 16 : 48, },
   label: { fontWeight: 'bold', marginTop: 12 },
   input: {
     borderWidth: 1,
