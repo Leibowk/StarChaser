@@ -15,10 +15,14 @@ class WeatherSettings(BaseModel):
     URL: str
     API_KEY: str
 
+class SecretSettings(BaseModel):
+    Key: str
+
 
 class Settings(BaseSettings):
     POSTGRES: PostgresSettings
     WEATHER: WeatherSettings
+    Secrets: SecretSettings
 
 
 with open("localsettings.json") as f:

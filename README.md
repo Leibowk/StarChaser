@@ -88,14 +88,22 @@ GoDaddy -> thestarchaser.com
 
 Cloudflare -> URL redirection
 
-Run "npm run dev"
+```bash
+npm run dev
+```
 
 Get package.json from dev to run. Requires setting up cloudflare.
+Requirement 
+
+```bash
+npm i concurrently
+```
 
 To access website:
 Download expo go.
 enter in url: exp://ya5evyg-anonymous-8081.exp.direct
 Enjoy!
+(requires server running - ping Kyle if you want to test!)
 
 ## Notes
 
@@ -133,3 +141,7 @@ To debug add a launch.json in the .vscode folder. Then simply set break points a
   ]
 }
 ```
+
+
+## Contact Info
+thestarchaserofficial@gmail.com

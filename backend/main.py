@@ -1,17 +1,25 @@
 from typing import Optional
 from fastapi import FastAPI, Query
 from fastapi.middleware.cors import CORSMiddleware
+from middleware.rate_limit import register_rate_limiter
+from middleware.auth import APIKeyMiddleware
 from enums.site_visibility import SiteVisibility
 from services.site_service import SiteService
 from fastapi.staticfiles import StaticFiles
 from models.site import Site
 from models.site_summary import SiteSummary
 import os
+from config import settings
 
 app = FastAPI()
 
+api_primary_key = settings.Secrets.Key
+app.add_middleware(APIKeyMiddleware, api_key=api_primary_key)
+register_rate_limiter(app)
+
 # CORS settings
 origins = [
+    "https://thestarchaser.com",
     "http://localhost:8081",
     "http://127.0.0.1:8080",
     "http://localhost:8080",

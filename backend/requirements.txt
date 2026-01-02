@@ -9,4 +9,4 @@ requests
 GeoAlchemy2
 shapely
 pytest
-concurrently
+slowapi
