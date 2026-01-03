@@ -1,6 +1,5 @@
-// SearchPanel.tsx
 import React, { useState, useEffect } from 'react';
-import { View, TextInput, Text, Button, StyleSheet, Alert, StatusBar } from 'react-native';
+import { View, TextInput, Text, Button, StyleSheet, Alert } from 'react-native';
 import { Picker } from '@react-native-picker/picker';
 import * as Location from 'expo-location';
 
@@ -36,7 +35,6 @@ export const SearchPanel = ({ onSearch }: Props) => {
   const [siteVisib, setSiteVisib] = useState<VisibilityOption>('Any');
   const [locationGranted, setLocationGranted] = useState(false);
 
-  // Request location permission once
   useEffect(() => {
     (async () => {
       const { status } = await Location.requestForegroundPermissionsAsync();
@@ -49,7 +47,6 @@ export const SearchPanel = ({ onSearch }: Props) => {
     let lon: number | undefined;
 
     if (useLocation) {
-      debugger;
       if (!locationGranted) {
         Alert.alert(
           'Location required',
@@ -63,12 +60,13 @@ export const SearchPanel = ({ onSearch }: Props) => {
       lon = current.coords.longitude;
     }
 
+    // Build search params
     const params: SearchParams = {
       name: name.trim() || undefined,
       lat,
       lon,
-      radius_km: radiusKm ? parseFloat(radiusKm) : undefined,
-      site_visib: siteVisib,
+      site_visib: siteVisib !== 'Any' ? siteVisib : undefined,
+      ...(useLocation ? { radius_km: radiusKm ? parseFloat(radiusKm) : undefined } : {}),
     };
 
     onSearch(params);
@@ -82,35 +80,39 @@ export const SearchPanel = ({ onSearch }: Props) => {
         value={name}
         onChangeText={setName}
         placeholder="Enter site name"
+        placeholderTextColor="#ccc"
       />
 
       <View style={styles.row}>
-        <Text>Search near my location:</Text>
+        <Text style={styles.label}>Search near my location:</Text>
         <Button
           title={useLocation ? 'Yes' : 'No'}
           onPress={() => setUseLocation((prev) => !prev)}
         />
       </View>
 
-      <Text style={styles.label}>Radius (km):</Text>
-      <TextInput
-        style={styles.input}
-        value={radiusKm}
-        onChangeText={setRadiusKm}
-        keyboardType="numeric"
-      />
+      {useLocation && (
+        <>
+          <Text style={styles.label}>Radius (km):</Text>
+          <TextInput
+            style={styles.input}
+            value={radiusKm}
+            onChangeText={setRadiusKm}
+            keyboardType="numeric"
+            placeholder="Enter radius in km"
+            placeholderTextColor="#ccc"
+          />
+        </>
+      )}
 
       <Text style={styles.label}>Visibility rating:</Text>
       <Picker
         selectedValue={siteVisib}
         onValueChange={(value: VisibilityOption) => setSiteVisib(value)}
+        style={styles.picker}
       >
         {VISIBILITY_OPTIONS.map((opt) => (
-          <Picker.Item
-            key={opt}
-            label={opt}
-            value={opt}
-          />
+          <Picker.Item key={opt} label={opt} value={opt} />
         ))}
       </Picker>
 
@@ -120,14 +122,20 @@ export const SearchPanel = ({ onSearch }: Props) => {
 };
 
 const styles = StyleSheet.create({
-  container: { padding: 16, backgroundColor: '#fff', paddingTop: StatusBar.currentHeight ? StatusBar.currentHeight + 16 : 48, },
-  label: { fontWeight: 'bold', marginTop: 12 },
+  container: {
+    padding: 16,
+    backgroundColor: 'rgba(10, 10, 30, 0.75)',
+    borderRadius: 12,
+    marginBottom: 16,
+  },
+  label: { fontWeight: 'bold', color: '#FFD700', marginTop: 12 },
   input: {
     borderWidth: 1,
     borderColor: '#ccc',
     padding: 8,
     borderRadius: 6,
     marginTop: 4,
+    color: '#fff',
   },
   row: {
     flexDirection: 'row',
@@ -135,5 +143,5 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     marginVertical: 12,
   },
-  picker: { height: 50, width: '100%' },
+  picker: { height: 50, width: '100%', color: '#fff', backgroundColor: 'rgba(255,255,255,0.1)' },
 });

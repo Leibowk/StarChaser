@@ -1,6 +1,6 @@
 // app/search.tsx
 import React, { useState } from 'react';
-import { View, StyleSheet, FlatList, Text, TouchableOpacity } from 'react-native';
+import { View, StyleSheet, FlatList, Text, TouchableOpacity, ImageBackground, ScrollView } from 'react-native';
 import { SearchPanel, SearchParams } from '../../webviews/SearchPanel';
 import { Site } from '../../lib/types';
 import apiFetch from '../../lib/api';
@@ -43,38 +43,80 @@ export default function SearchScreen() {
     }
   };
 
-  return (
-    <View style={styles.container}>
-      <SearchPanel onSearch={handleSearch} />
-
-      <FlatList
-        data={results}
-        keyExtractor={(item) => item.id.toString()}
-        renderItem={({ item }) => (
-          <TouchableOpacity
-            onPress={() => router.push(`/site/${item.id}`)}
-            style={styles.item}
-          >
-            <Text style={styles.title}>{item.name}</Text>
-            <Text style={styles.desc}>{item.description}</Text>
-          </TouchableOpacity>
-        )}
-        ListEmptyComponent={() => (
-          !loading ? (
-            <Text style={styles.emptyText}>
-              No results. Try adjusting your search criteria.
-            </Text>
-          ) : null
-        )}
-      />
-    </View>
+     return (
+      <ImageBackground
+        source={require('../../assets/milk_way_galaxy.png')}
+        style={styles.background}
+        imageStyle={{ opacity: 0.5 }}
+        resizeMode="cover"
+      >
+        <FlatList
+          data={results}
+          keyExtractor={(item) => item.id.toString()}
+          renderItem={({ item }) => (
+            <TouchableOpacity
+              onPress={() => router.push(`/site/${item.id}`)}
+              style={styles.itemCard}
+            >
+              <Text style={styles.itemTitle}>{item.name}</Text>
+              <Text style={styles.itemDesc}>{item.description}</Text>
+            </TouchableOpacity>
+          )}
+          ListEmptyComponent={() =>
+            !loading ? (
+              <Text style={styles.emptyText}>
+                No results. Try adjusting your search criteria.
+              </Text>
+            ) : null
+          }
+          contentContainerStyle={{
+            paddingTop: 60,
+            paddingHorizontal: 16,
+            paddingBottom: 40,
+          }}
+          ListHeaderComponent={
+            <>
+              <Text style={styles.pageTitle}>Search Sites</Text>
+              <View style={styles.searchCard}>
+                <SearchPanel onSearch={handleSearch} />
+              </View>
+            </>
+          }
+        />
+      </ImageBackground>
   );
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: '#fff' },
-  item: { padding: 12, borderBottomWidth: 1, borderBottomColor: '#ccc' },
-  title: { fontWeight: 'bold', fontSize: 16 },
-  desc: { marginTop: 4, color: '#555' },
-  emptyText: { textAlign: 'center', marginTop: 20, color: '#888' },
+  background: { flex: 1 },
+  scrollContainer: {
+    paddingTop: 60, // move everything down from status bar
+    paddingHorizontal: 16,
+    paddingBottom: 20,
+  },
+  pageTitle: {
+    fontSize: 32,
+    fontWeight: 'bold',
+    color: '#FFD700',
+    textAlign: 'center',
+    marginBottom: 16,
+    textShadowColor: '#000',
+    textShadowOffset: { width: 2, height: 2 },
+    textShadowRadius: 6,
+  },
+  searchCard: {
+    backgroundColor: 'rgba(10, 10, 30, 0.75)',
+    borderRadius: 16,
+    padding: 16,
+    marginBottom: 24,
+  },
+  itemCard: {
+    backgroundColor: 'rgba(10, 10, 30, 0.75)',
+    borderRadius: 16,
+    padding: 16,
+    marginVertical: 8,
+  },
+  itemTitle: { fontWeight: 'bold', fontSize: 16, color: '#FFD700' },
+  itemDesc: { color: '#fff', marginTop: 4 },
+  emptyText: { marginTop: 16, color: '#ccc', textAlign: 'center' },
 });
