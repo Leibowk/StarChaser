@@ -35,33 +35,42 @@ export const SearchPanel = ({ onSearch }: Props) => {
   const [siteVisib, setSiteVisib] = useState<VisibilityOption>('Any');
   const [locationGranted, setLocationGranted] = useState(false);
   const [loading, setLoading] = useState(false);
-
+  const [cachedLocation, setCachedLocation] = useState<{lat:number, lon:number} | null>(null);
   useEffect(() => {
-    (async () => {
-      const { status } = await Location.requestForegroundPermissionsAsync();
-      setLocationGranted(status === 'granted');
-    })();
-  }, []);
+    if (useLocation && !cachedLocation && locationGranted) {
+    Location.getCurrentPositionAsync({}).then(loc => {
+      setCachedLocation({ lat: loc.coords.latitude, lon: loc.coords.longitude });
+    }).catch(err => console.warn(err));
+  }
+}, [useLocation, locationGranted]);
 
   const handleSearch = async () => {
     if (loading) return; // prevent double taps
-
     setLoading(true);
+
     let lat: number | undefined;
     let lon: number | undefined;
 
     if (useLocation) {
       try {
         const { status } = await Location.getForegroundPermissionsAsync();
-        if (status === 'granted') {
-          const current = await Location.getCurrentPositionAsync({});
-          lat = current.coords.latitude;
-          lon = current.coords.longitude;
-        } else {
+        if (status !== 'granted') {
           Alert.alert('Location required', 'Please enable location permission to search nearby.');
+        } else {
+          // fetch location if not cached
+          if (cachedLocation) {
+            lat = cachedLocation.lat;
+            lon = cachedLocation.lon;
+          } else {
+            const current = await Location.getCurrentPositionAsync({});
+            lat = current.coords.latitude;
+            lon = current.coords.longitude;
+            setCachedLocation({ lat, lon }); // cache for next time
+          }
         }
       } catch (err) {
         console.warn('Location fetch failed', err);
+        Alert.alert('Error', 'Could not get your current location.');
       }
     }
 
@@ -70,11 +79,11 @@ export const SearchPanel = ({ onSearch }: Props) => {
       lat,
       lon,
       visib: siteVisib !== 'Any' ? siteVisib : undefined,
-      ...(useLocation && lat && lon ? { radius_km: parseFloat(radiusKm) } : {}),
+      ...(useLocation && lat != null && lon != null ? { radius_km: parseFloat(radiusKm) } : {}),
     };
 
     try {
-      await onSearch(params); // await so we don’t overlap calls
+      await onSearch(params); // await backend call
     } finally {
       setLoading(false);
     }
