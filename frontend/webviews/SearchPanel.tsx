@@ -123,6 +123,7 @@ export const SearchPanel = ({ onSearch }: Props) => {
       )}
 
       <Text style={styles.label}>Visibility rating:</Text>
+      <Text style={styles.subLabel}>(returns all sites better than selected Visibility)</Text>
       <Picker
         selectedValue={siteVisib}
         onValueChange={(value: VisibilityOption) => setSiteVisib(value)}
@@ -154,6 +155,13 @@ const styles = StyleSheet.create({
     marginBottom: 16,
   },
   label: { fontWeight: 'bold', color: '#FFD700', marginTop: 12 },
+  subLabel: {
+    fontSize: 12,         // smaller than main label
+    fontStyle: 'italic',  // italic
+    color: '#FFD700',     // optional, same color or slightly dimmer
+    marginTop: 2,         // small gap to main label
+    marginBottom: 6,      // optional: spacing before next input
+  },
   input: {
     borderWidth: 1,
     borderColor: '#ccc',
