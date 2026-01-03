@@ -118,5 +118,5 @@ const styles = StyleSheet.create({
   },
   itemTitle: { fontWeight: 'bold', fontSize: 16, color: '#FFD700' },
   itemDesc: { color: '#fff', marginTop: 4 },
-  emptyText: { marginTop: 16, color: '#ccc', textAlign: 'center' },
+  emptyText: { marginTop: 16, color: '#FFD700', textAlign: 'center' },
 });

@@ -143,5 +143,11 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     marginVertical: 12,
   },
-  picker: { height: 50, width: '100%', color: '#fff', backgroundColor: 'rgba(255,255,255,0.1)' },
+  picker: { 
+    height: 60, 
+    width: '100%', 
+    color: '#fff', 
+    backgroundColor: 'rgba(255,255,255,0.1)',
+    marginBottom: 12, 
+  },
 });
