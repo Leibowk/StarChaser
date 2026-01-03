@@ -63,8 +63,8 @@ def search(
     lat: Optional[float] = None,
     lon: Optional[float] = None,
     radius_km: Optional[float] = None,
-    site_visib: Optional[SiteVisibility] = Query(
+    visib: Optional[SiteVisibility] = Query(
         None,
         description="Overall site visibility rating",
     )) -> list[Site]:
-    return site_service.search(name, lat, lon, radius_km, site_visib)
+    return site_service.search(name, lat, lon, radius_km, visib)
