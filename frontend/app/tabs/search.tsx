@@ -21,7 +21,7 @@ export default function SearchScreen() {
         ...(params.lat !== undefined ? { lat: String(params.lat) } : {}),
         ...(params.lon !== undefined ? { lon: String(params.lon) } : {}),
         ...(params.radius_km !== undefined ? { radius_km: String(params.radius_km) } : {}),
-        ...(params.site_visib ? params.site_visib === 'Any' ? { site_visib: 'Terrible' } : { site_visib: String(params.site_visib) } : {}),
+        ...(params.visib ? params.visib === 'Any' ? { visib: 'Terrible' } : { visib: String(params.visib) } : {}),
       }).toString();
 
       const rawResults = await apiFetch(`/sites/search?${query}`);

@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { View, TextInput, Text, Button, StyleSheet, Alert } from 'react-native';
+import { View, TextInput, Text, Button, StyleSheet, Alert, TouchableOpacity } from 'react-native';
 import { Picker } from '@react-native-picker/picker';
 import * as Location from 'expo-location';
 
@@ -8,7 +8,7 @@ export type SearchParams = {
   lat?: number;
   lon?: number;
   radius_km?: number;
-  site_visib?: string;
+  visib?: string;
 };
 
 type Props = {
@@ -34,6 +34,7 @@ export const SearchPanel = ({ onSearch }: Props) => {
   const [radiusKm, setRadiusKm] = useState('50');
   const [siteVisib, setSiteVisib] = useState<VisibilityOption>('Any');
   const [locationGranted, setLocationGranted] = useState(false);
+  const [loading, setLoading] = useState(false);
 
   useEffect(() => {
     (async () => {
@@ -43,33 +44,40 @@ export const SearchPanel = ({ onSearch }: Props) => {
   }, []);
 
   const handleSearch = async () => {
+    if (loading) return; // prevent double taps
+
+    setLoading(true);
     let lat: number | undefined;
     let lon: number | undefined;
 
     if (useLocation) {
-      if (!locationGranted) {
-        Alert.alert(
-          'Location required',
-          'Please enable location permission to search nearby.'
-        );
-        return;
+      try {
+        const { status } = await Location.getForegroundPermissionsAsync();
+        if (status === 'granted') {
+          const current = await Location.getCurrentPositionAsync({});
+          lat = current.coords.latitude;
+          lon = current.coords.longitude;
+        } else {
+          Alert.alert('Location required', 'Please enable location permission to search nearby.');
+        }
+      } catch (err) {
+        console.warn('Location fetch failed', err);
       }
-
-      const current = await Location.getCurrentPositionAsync({});
-      lat = current.coords.latitude;
-      lon = current.coords.longitude;
     }
 
-    // Build search params
     const params: SearchParams = {
       name: name.trim() || undefined,
       lat,
       lon,
-      site_visib: siteVisib !== 'Any' ? siteVisib : undefined,
-      ...(useLocation ? { radius_km: radiusKm ? parseFloat(radiusKm) : undefined } : {}),
+      visib: siteVisib !== 'Any' ? siteVisib : undefined,
+      ...(useLocation && lat && lon ? { radius_km: parseFloat(radiusKm) } : {}),
     };
 
-    onSearch(params);
+    try {
+      await onSearch(params); // await so we don’t overlap calls
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -116,7 +124,15 @@ export const SearchPanel = ({ onSearch }: Props) => {
         ))}
       </Picker>
 
-      <Button title="Search" onPress={handleSearch} />
+      
+      <TouchableOpacity
+        onPress={handleSearch}
+        activeOpacity={0.6} // decreases opacity when pressed
+        style={styles.searchButton}
+        disabled={loading} // disable while searching
+      >
+        <Text style={styles.searchButtonText}>{loading ? 'Searching...' : 'Search'}</Text>
+      </TouchableOpacity>
     </View>
   );
 };
@@ -149,5 +165,17 @@ const styles = StyleSheet.create({
     color: '#fff', 
     backgroundColor: 'rgba(255,255,255,0.1)',
     marginBottom: 12, 
+  },
+  searchButton: {
+    backgroundColor: '#FFD700',
+    paddingVertical: 12,
+    borderRadius: 8,
+    alignItems: 'center',
+    marginTop: 16,
+  },
+  searchButtonText: {
+    color: '#000',
+    fontWeight: 'bold',
+    fontSize: 16,
   },
 });
