@@ -6,10 +6,16 @@
 ###Replace value with value from localsettings.json
 @apiKey = xyz
 
+@openWeatherKey = abc
+
 ### Get current weather for Whatcom County, WA
-GET http://api.weatherapi.com/v1/current.json?key={{apiKey}}&q={{lat}},{{long}}&aqi={{returnAqi}}
+GET http://api.weatherapi.com/v1/current.json?key={{apiKey}}&q={{lat}},{{long}}&aqi={{{{returnAqi}}}}
 Accept: application/json
 
 ### Get future weather for Whatcom County, WA
-GET http://api.weatherapi.com/v1/forecast.json?days=1&dt=2026-01-07&hour=22&key={{apiKey}}&q={{lat}},{{long}}&aqi={{returnAqi}}
+GET http://api.weatherapi.com/v1/forecast.json?days=1&dt=2026-01-06&hour=22&key={{apiKey}}&q={{lat}},{{long}}&aqi={{returnAqi}}
 Accept: application/json
+
+
+###Open Weather API Testing
+https://api.openweathermap.org/data/2.5/forecast?lat={{lat}}&lon={{long}}&appid={{openWeatherKey}}
