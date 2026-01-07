@@ -11,7 +11,7 @@ class PostgresSettings(BaseModel):
     DB: str
 
 
-class WeatherSettings(BaseModel):
+class ApiSettings(BaseModel):
     URL: str
     API_KEY: str
 
@@ -21,7 +21,8 @@ class SecretSettings(BaseModel):
 
 class Settings(BaseSettings):
     POSTGRES: PostgresSettings
-    WEATHER: WeatherSettings
+    WEATHER_API: ApiSettings
+    OPEN_WEATHER_MAP: ApiSettings
     Secrets: SecretSettings
 
 

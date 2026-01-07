@@ -1,6 +1,7 @@
 from datetime import datetime, time, timedelta
 import requests
 from typing import Optional
+from services.date_time_service import DateTimeService
 from enums.time_visibility import TimeVisibility
 from config import settings
 from models.weather import Weather
@@ -9,15 +10,16 @@ from models.weather import Weather
 class WeatherApiService:
     def __init__(self, http_client=requests):
         self.http_client = http_client
-        self.base_url = settings.WEATHER.URL
-        self.api_key = settings.WEATHER.API_KEY
+        self.base_url = settings.WEATHER_API.URL
+        self.api_key = settings.WEATHER_API.API_KEY
         self.timeout = 5  # seconds
+        self.datetimeservice = DateTimeService()
 
     def get_forecast_weather(self, lat: float, lon: float, time_visibility: Optional[TimeVisibility]) -> Optional[Weather]:
         """
         Fetches forecast weather for a lat/lon and returns a Weather model.
         """
-        daytime = date_time_helper(time_visibility)
+        daytime = self.datetimeservice.date_time_helper(time_visibility)
 
         params = {
             "key": self.api_key,
@@ -51,39 +53,3 @@ class WeatherApiService:
         except Exception as e:
             print(f"[WeatherApiService] Error fetching weather: {e}")
             return None
-        
-    
-def date_time_helper(time_visibility: Optional[TimeVisibility]) -> datetime:
-    """
-    Returns a datetime object based on the TimeVisibility enum.
-    
-    Rules:
-    - None -> tonight at 10 PM
-    - NOW -> forecast datetime
-    - TONIGHT -> today at 10 PM
-    - TOMORROW_NIGHT -> tomorrow at 10 PM
-    - NIGHTS_3_FROM_NOW -> 3 nights from today at 10 PM
-    """
-    now = datetime.now()
-    target_time = time(22, 0)  # 10:00 PM
-
-    if time_visibility is None:
-        # Default to tonight at 10 PM
-        return datetime.combine(now.date(), target_time)
-    
-    if time_visibility == TimeVisibility.NOW:
-        return now
-
-    if time_visibility == TimeVisibility.TONIGHT:
-        return datetime.combine(now.date(), target_time)
-
-    if time_visibility == TimeVisibility.TOMORROW_NIGHT:
-        tomorrow = now.date() + timedelta(days=1)
-        return datetime.combine(tomorrow, target_time)
-
-    if time_visibility == TimeVisibility.NIGHTS_3_FROM_NOW:
-        three_nights = now.date() + timedelta(days=3)
-        return datetime.combine(three_nights, target_time)
-
-    # fallback just in case
-    return datetime.combine(now.date(), target_time)

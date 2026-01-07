@@ -7,13 +7,13 @@ from models.weather import Weather
 from enums.site_visibility import SiteVisibility
 from models.visibility import Visibility
 from services.light_pollution_service import LightPollutionService
-from backend.services.weatherapi_service import WeatherApiService
+from services.open_weather_map_service import OpenWeatherMapService
 
 
 class VisibilityService:
     def __init__(self):
         self.lp_service = LightPollutionService()
-        self.weather_service = WeatherApiService()
+        self.weather_service = OpenWeatherMapService()
 
     def compute_visibility(self, lat, long, time_visibility: Optional[TimeVisibility] = None) -> Visibility:
 
@@ -34,8 +34,7 @@ class VisibilityService:
     def compute_score(self, lp: LightPollution, weather: Weather):
         lp_factor = lp.lp_index/47
         cloud_factor = weather.cloud_coverage/100
-        ##aqi = 1-self.aqi_factor(weather.aqi)
-        aqi = 0
+        aqi = 1-self.aqi_factor(weather.aqi)
         effective_vis = min(weather.avgvis_km, 15)
         vis_distance = 1 - (effective_vis / 15)
         score = 1-lp_factor - cloud_factor - aqi - (vis_distance * 0.15)
