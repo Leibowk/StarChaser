@@ -1,8 +1,10 @@
 from typing import Optional
-from fastapi import FastAPI, Query
+from fastapi import FastAPI, Query, Security
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.security import APIKeyHeader, HTTPBearer
 from middleware.rate_limit import register_rate_limiter
 from middleware.auth import APIKeyMiddleware
+from enums.time_visibility import TimeVisibility
 from enums.site_visibility import SiteVisibility
 from services.site_service import SiteService
 from fastapi.staticfiles import StaticFiles
@@ -11,7 +13,11 @@ from models.site_summary import SiteSummary
 import os
 from config import settings
 
-app = FastAPI()
+swagger_api_key = APIKeyHeader(name="x-api-key", auto_error=False)
+
+app = FastAPI(
+    dependencies=[Security(swagger_api_key)]
+)
 
 api_primary_key = settings.Secrets.Key
 app.add_middleware(APIKeyMiddleware, api_key=api_primary_key)
@@ -45,8 +51,12 @@ def get_sites() -> list[SiteSummary]:
     return site_service.get_all_sites()
 
 @app.get("/site/{site_id}", response_model=Site)
-def get_site(site_id: int) -> Site:
-    return site_service.get_site(site_id)
+def get_site(site_id: int,
+             time_visibility: Optional[TimeVisibility] = Query(
+                None,
+                description="Time window used to evaluate site visibility"
+            )) -> Site:
+    return site_service.get_site(site_id, time_visibility)
 
 @app.get(
         "/sites/search", 

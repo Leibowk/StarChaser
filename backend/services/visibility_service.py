@@ -1,5 +1,7 @@
 
 
+from typing import Optional
+from enums.time_visibility import TimeVisibility
 from models.light_pollution import LightPollution
 from models.weather import Weather
 from enums.site_visibility import SiteVisibility
@@ -13,10 +15,10 @@ class VisibilityService:
         self.lp_service = LightPollutionService()
         self.weather_service = WeatherService()
 
-    def compute_visibility(self, lat, long) -> Visibility:
+    def compute_visibility(self, lat, long, time_visibility: Optional[TimeVisibility]) -> Visibility:
 
         lp = self.lp_service.get_for_location(lat, long)
-        weather = self.weather_service.get_current_weather(lat, long)
+        weather = self.weather_service.get_forecast_weather(lat, long, time_visibility)
         
         score = self.compute_score(lp, weather)
 
@@ -32,7 +34,8 @@ class VisibilityService:
     def compute_score(self, lp: LightPollution, weather: Weather):
         lp_factor = lp.lp_index/47
         cloud_factor = weather.cloud_coverage/100
-        aqi = 1-self.aqi_factor(weather.aqi)
+        ##aqi = 1-self.aqi_factor(weather.aqi)
+        aqi = 0
         effective_vis = min(weather.avgvis_km, 15)
         vis_distance = 1 - (effective_vis / 15)
         score = 1-lp_factor - cloud_factor - aqi - (vis_distance * 0.15)

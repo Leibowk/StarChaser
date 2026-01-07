@@ -1,4 +1,5 @@
 from typing import Optional
+from enums.time_visibility import TimeVisibility
 from enums.site_visibility import SiteVisibility
 from models.visibility import Visibility
 from repositories.site_repo import SiteRepository
@@ -33,12 +34,12 @@ class SiteService:
             )
         return sites
 
-    def get_site(self, site_id: int) -> Site:
+    def get_site(self, site_id: int, time_visibility: Optional[TimeVisibility]) -> Site:
         r = self.site_repo.get_site(site_id)
         if not r:
             return None
 
-        visibility = self.visibility_service.compute_visibility(r.latitude, r.longitude)
+        visibility = self.visibility_service.compute_visibility(r.latitude, r.longitude, time_visibility)
         return Site(
             id=r.id,
             name=r.name,
