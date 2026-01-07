@@ -4,7 +4,7 @@
 @returnAqi=yes
 
 ###Replace value with value from localsettings.json
-@apiKey = @apiKey = xyz
+@apiKey = xyz
 
 ### Get current weather for Whatcom County, WA
 GET http://api.weatherapi.com/v1/current.json?key={{apiKey}}&q={{lat}},{{long}}&aqi={{returnAqi}}
