@@ -32,12 +32,12 @@ class SiteService:
             )
         return sites
 
-    def get_site(self, site_id: int, time_visibility: Optional[TimeVisibility]) -> Site:
+    def get_site(self, site_id: int, time: Optional[TimeVisibility] = None) -> Site:
         r = self.site_repo.get_site(site_id)
         if not r:
             return None
 
-        visibility = self.visibility_service.compute_visibility(r.latitude, r.longitude, time_visibility)
+        visibility = self.visibility_service.compute_visibility(r.latitude, r.longitude, time)
         return Site(
             id=r.id,
             name=r.name,
@@ -52,16 +52,17 @@ class SiteService:
         lat: Optional[float] = None,
         lon: Optional[float] = None,
         radius_km: Optional[float] = None,
-        site_visib: Optional[SiteVisibility] = None) -> list[Site]:
+        visib: Optional[SiteVisibility] = None,
+        time: Optional[TimeVisibility] = None) -> list[Site]:
 
         rows = self.site_repo.search(name, lat, lon, radius_km)
         
         sites = []
 
         for r in rows:
-            if site_visib is not None:
-                visibility = self.visibility_service.compute_visibility(r.latitude, r.longitude)
-                valid = self.visibility_service.meets_visibility_threshold(visibility.score, site_visib)
+            if visib is not None:
+                visibility = self.visibility_service.compute_visibility(r.latitude, r.longitude, time)
+                valid = self.visibility_service.meets_visibility_threshold(visibility.score, visib)
                 if valid:
                     sites.append(
                         Site(

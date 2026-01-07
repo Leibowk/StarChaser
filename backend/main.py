@@ -52,11 +52,11 @@ def get_sites() -> list[SiteSummary]:
 
 @app.get("/site/{site_id}", response_model=Site)
 def get_site(site_id: int,
-             time_visibility: Optional[TimeVisibility] = Query(
+             time: Optional[TimeVisibility] = Query(
                 None,
                 description="Time window used to evaluate site visibility"
             )) -> Site:
-    return site_service.get_site(site_id, time_visibility)
+    return site_service.get_site(site_id, time)
 
 @app.get(
         "/sites/search", 
@@ -76,5 +76,9 @@ def search(
     visib: Optional[SiteVisibility] = Query(
         None,
         description="Overall site visibility rating",
+    ),
+    time: Optional[TimeVisibility] = Query(
+        None,
+        description="Time window used to evaluate site visibility"
     )) -> list[Site]:
-    return site_service.search(name, lat, lon, radius_km, visib)
+    return site_service.search(name, lat, lon, radius_km, visib, time)
