@@ -15,7 +15,7 @@ class VisibilityService:
         self.lp_service = LightPollutionService()
         self.weather_service = WeatherService()
 
-    def compute_visibility(self, lat, long, time_visibility: Optional[TimeVisibility]) -> Visibility:
+    def compute_visibility(self, lat, long, time_visibility: Optional[TimeVisibility] = None) -> Visibility:
 
         lp = self.lp_service.get_for_location(lat, long)
         weather = self.weather_service.get_forecast_weather(lat, long, time_visibility)

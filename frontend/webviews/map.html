@@ -11,6 +11,11 @@
       height: 100%;
       margin: 0;
     }
+
+  .leaflet-top {
+    top: calc(env(safe-area-inset-top) + 55px) !important;
+  }
+
     .space-popup {
       background: linear-gradient(135deg, #181c2f 80%, #232946 100%);
       color: #e0e6f7;
@@ -101,7 +106,8 @@
     const map = L.map('map', {
       center: [48.75, -122.52],
       zoom: 9,
-      layers: [osm, light2024]
+      layers: [osm, light2024],
+      worldCopyJump: true
     });
 
     L.control.layers({ OpenStreetMap: osm }, { '2024 Light Pollution': light2024 }).addTo(map);
