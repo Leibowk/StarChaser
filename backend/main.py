@@ -78,7 +78,7 @@ def search(
         description="Overall site visibility rating",
     ),
     time: Optional[TimeVisibility] = Query(
-        None,
+        TimeVisibility.TONIGHT,
         description="Time window used to evaluate site visibility"
     )) -> list[Site]:
     return site_service.search(name, lat, lon, radius_km, visib, time)

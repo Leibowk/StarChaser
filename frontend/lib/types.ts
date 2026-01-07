@@ -37,3 +37,10 @@ export type WeatherData = {
   condition: string;
   aqi: number;
 };
+
+export const TIME_OPTIONS = [
+  'Now',
+  'Tonight',
+  'Tomorrow Night',
+  'Three Nights From Now',
+] as const;

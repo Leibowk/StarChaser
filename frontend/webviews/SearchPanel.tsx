@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { View, TextInput, Text, Button, StyleSheet, Alert, TouchableOpacity } from 'react-native';
 import { Picker } from '@react-native-picker/picker';
 import * as Location from 'expo-location';
+import { TIME_OPTIONS } from '../lib/types';
 
 export type SearchParams = {
   name?: string;
@@ -9,6 +10,7 @@ export type SearchParams = {
   lon?: number;
   radius_km?: number;
   visib?: string;
+  time?: string;
 };
 
 type Props = {
@@ -27,12 +29,14 @@ const VISIBILITY_OPTIONS = [
 ] as const;
 
 type VisibilityOption = typeof VISIBILITY_OPTIONS[number];
+type TimeOption = typeof TIME_OPTIONS[number];
 
 export const SearchPanel = ({ onSearch }: Props) => {
   const [name, setName] = useState('');
   const [useLocation, setUseLocation] = useState(false);
   const [radiusKm, setRadiusKm] = useState('50');
   const [siteVisib, setSiteVisib] = useState<VisibilityOption>('Any');
+  const [timeVisibility, setTimeVisibility] = useState<TimeOption>('Tonight');
   const [locationGranted, setLocationGranted] = useState(false);
   const [loading, setLoading] = useState(false);
   const [cachedLocation, setCachedLocation] = useState<{lat:number, lon:number} | null>(null);
@@ -79,6 +83,7 @@ export const SearchPanel = ({ onSearch }: Props) => {
       lat,
       lon,
       visib: siteVisib !== 'Any' ? siteVisib : undefined,
+      time: timeVisibility,
       ...(useLocation && lat != null && lon != null ? { radius_km: parseFloat(radiusKm) } : {}),
     };
 
@@ -127,10 +132,24 @@ export const SearchPanel = ({ onSearch }: Props) => {
       <Picker
         selectedValue={siteVisib}
         onValueChange={(value: VisibilityOption) => setSiteVisib(value)}
-        style={styles.picker}
+        style={styles.picker} 
+        dropdownIconColor="#FFD700"
       >
         {VISIBILITY_OPTIONS.map((opt) => (
-          <Picker.Item key={opt} label={opt} value={opt} />
+          <Picker.Item key={opt} label={opt} value={opt} color="#FFD700" />
+        ))}
+      </Picker>
+
+      <Text style={styles.label}>Time window:</Text>
+      <Text style={styles.subLabel}>(used to evaluate site visibility)</Text>
+      <Picker
+        selectedValue={timeVisibility}
+        onValueChange={(value: TimeOption) => setTimeVisibility(value)}
+        style={styles.picker}
+        dropdownIconColor="#FFD700"
+      >
+        {TIME_OPTIONS.map((opt) => (
+          <Picker.Item key={opt} label={opt} value={opt} color="#FFD700" />
         ))}
       </Picker>
 
@@ -179,9 +198,11 @@ const styles = StyleSheet.create({
   picker: { 
     height: 60, 
     width: '100%', 
-    color: '#fff', 
-    backgroundColor: 'rgba(255,255,255,0.1)',
-    marginBottom: 12, 
+    color: '#FFD700', // text color
+    backgroundColor: 'rgba(255,255,255,0.1)', // subtle dark background
+    marginBottom: 12,
+    borderRadius: 6, 
+    paddingHorizontal: 8,
   },
   searchButton: {
     backgroundColor: '#FFD700',

@@ -8,18 +8,21 @@ import {
 } from 'react-native';
 import { useLocalSearchParams, useNavigation} from 'expo-router';
 import { useEffect, useState } from 'react';
-import { Site } from '../../lib/types';
+import { Site, TIME_OPTIONS } from '../../lib/types';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import apiFetch from '../../lib/api';
 import { mapApiSiteToSite } from '../../lib/typeMapper';
+import { Picker } from '@react-native-picker/picker';
 
 
+type TimeOption = typeof TIME_OPTIONS[number];
 
 export default function SiteDetailScreen() {
   const { id } = useLocalSearchParams<{ id: string }>();
   const [site, setSite] = useState<Site | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [timeVisibility, setTimeVisibility] = useState<TimeOption>('Tonight');
   const navigation = useNavigation();
   const insets = useSafeAreaInsets();
 
@@ -28,7 +31,7 @@ useEffect(() => {
     if (!id) return;
     setLoading(true);
     try {
-      const data = await apiFetch(`/site/${id}`);
+      const data = await apiFetch(`/site/${id}?time=${encodeURIComponent(timeVisibility)}`);
       setSite(mapApiSiteToSite(data));
       setError(null);
     } catch (err: any) {
@@ -38,7 +41,7 @@ useEffect(() => {
     }
   }
   fetchSite();
-}, [id, navigation]);
+}, [id, navigation, timeVisibility]);
 
   if (loading) return <ActivityIndicator />;
   if (error) return <Text>Error: {error}</Text>;
@@ -60,6 +63,19 @@ return (
   >
         <View style={styles.card}>
           <Text style={styles.title}>{site.name}</Text>
+
+          <Text style={styles.labelPicker}>Time window:</Text>
+          <Text style={styles.subLabel}>(used to evaluate site visibility)</Text>
+          <Picker
+            selectedValue={timeVisibility}
+            onValueChange={(value: TimeOption) => setTimeVisibility(value)}
+            style={styles.picker}
+            dropdownIconColor="#FFD700"
+          >
+            {TIME_OPTIONS.map((opt) => (
+              <Picker.Item key={opt} label={opt} value={opt} color="#FFD700" />
+            ))}
+          </Picker>
 
           <Text style={styles.section}>Site Visibility</Text>
           <Text style={styles.label}>
@@ -140,6 +156,23 @@ const styles = StyleSheet.create({
     paddingHorizontal: 16,
     alignItems: 'center',
   },
+  subLabel: {
+    fontSize: 12,         // smaller than main label
+    fontStyle: 'italic',  // italic
+    color: '#FFD700',     // optional, same color or slightly dimmer
+    marginTop: 2,         // small gap to main label
+    marginBottom: 6,      // optional: spacing before next input
+  },
+
+  picker: { 
+    height: 60, 
+    width: '100%', 
+    color: '#FFD700', // text color
+    backgroundColor: 'rgba(255,255,255,0.1)', // subtle dark background
+    marginBottom: 12,
+    borderRadius: 6, 
+    paddingHorizontal: 8,
+  },
 
   card: {
     width: '100%',
@@ -167,6 +200,8 @@ const styles = StyleSheet.create({
     marginTop: 20,
     marginBottom: 8,
   },
+
+  labelPicker: { fontWeight: 'bold', color: '#FFD700', marginTop: 12 },
 
   label: {
     fontSize: 18,
