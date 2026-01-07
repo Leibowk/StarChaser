@@ -1,9 +1,9 @@
 import requests
-from services.weather_service import WeatherService
+from backend.services.weatherapi_service import WeatherApiService
 from models.weather import Weather
 from tests.mocks.http import ResponseMock, HttpClientMock
 
-class TestWeatherService:
+class TestWeatherApiService:
     def test_get_current_weather_success(self):
         fake_response = ResponseMock({
             "current": {
@@ -16,7 +16,7 @@ class TestWeatherService:
         })
 
         http_client = HttpClientMock(response=fake_response)
-        service = WeatherService(http_client=http_client)
+        service = WeatherApiService(http_client=http_client)
 
         result = service.get_current_weather(48.75, -122.48)
 
@@ -33,7 +33,7 @@ class TestWeatherService:
         })
 
         http_client = HttpClientMock(response=fake_response)
-        service = WeatherService(http_client=http_client)
+        service = WeatherApiService(http_client=http_client)
 
         result = service.get_current_weather(0.0, 0.0)
 
@@ -48,7 +48,7 @@ class TestWeatherService:
         fake_response = ResponseMock({}, status_code=500)
 
         http_client = HttpClientMock(response=fake_response)
-        service = WeatherService(http_client=http_client)
+        service = WeatherApiService(http_client=http_client)
 
         result = service.get_current_weather(48.75, -122.48)
 
@@ -56,7 +56,7 @@ class TestWeatherService:
 
     def test_get_current_weather_network_error(self):
         http_client = HttpClientMock(should_raise=True)
-        service = WeatherService(http_client=http_client)
+        service = WeatherApiService(http_client=http_client)
 
         result = service.get_current_weather(48.75, -122.48)
 
@@ -66,7 +66,7 @@ class TestWeatherService:
         fake_response = ResponseMock({"current": {}})
         http_client = HttpClientMock(response=fake_response)
 
-        service = WeatherService(http_client=http_client)
+        service = WeatherApiService(http_client=http_client)
         service.get_current_weather(10.5, 20.5)
 
         params = http_client.last_request["params"]

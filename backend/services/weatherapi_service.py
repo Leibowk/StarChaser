@@ -6,7 +6,7 @@ from config import settings
 from models.weather import Weather
 
 
-class WeatherService:
+class WeatherApiService:
     def __init__(self, http_client=requests):
         self.http_client = http_client
         self.base_url = settings.WEATHER.URL
@@ -49,7 +49,7 @@ class WeatherService:
             )
 
         except Exception as e:
-            print(f"[WeatherService] Error fetching weather: {e}")
+            print(f"[WeatherApiService] Error fetching weather: {e}")
             return None
         
     

@@ -7,13 +7,13 @@ from models.weather import Weather
 from enums.site_visibility import SiteVisibility
 from models.visibility import Visibility
 from services.light_pollution_service import LightPollutionService
-from services.weather_service import WeatherService
+from backend.services.weatherapi_service import WeatherApiService
 
 
 class VisibilityService:
     def __init__(self):
         self.lp_service = LightPollutionService()
-        self.weather_service = WeatherService()
+        self.weather_service = WeatherApiService()
 
     def compute_visibility(self, lat, long, time_visibility: Optional[TimeVisibility] = None) -> Visibility:
 

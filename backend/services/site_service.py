@@ -5,7 +5,6 @@ from models.visibility import Visibility
 from repositories.site_repo import SiteRepository
 from services.visibility_service import VisibilityService
 from services.light_pollution_service import LightPollutionService
-from services.weather_service import WeatherService
 from models.site import Site
 from models.site_summary import SiteSummary
 
@@ -13,7 +12,6 @@ class SiteService:
     def __init__(self):
         self.site_repo = SiteRepository()
         self.lp_service = LightPollutionService()
-        self.weather_service = WeatherService()
         self.visibility_service = VisibilityService()
 
     def get_all_sites(self) -> list[SiteSummary]:
