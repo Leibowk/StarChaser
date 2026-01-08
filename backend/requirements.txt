@@ -10,3 +10,4 @@ GeoAlchemy2
 shapely
 pytest
 slowapi
+pillow

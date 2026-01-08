@@ -44,9 +44,11 @@ def process_tile(filename):
     if not filename.lower().endswith(".png"):
         return filename, "skipped"
 
-    img_path = os.path.join(INPUT_DIR, filename)
     out_path = os.path.join(OUTPUT_DIR, filename)
+    if os.path.exists(out_path):
+        return filename, "skipped"
 
+    img_path = os.path.join(INPUT_DIR, filename)
     img = Image.open(img_path).convert("RGBA")
     arr = np.array(img, dtype=np.int16)
     out_arr = np.zeros_like(arr, dtype=np.uint8)
