@@ -12,22 +12,22 @@ class ResponseMock:
 
 
 class HttpClientMock:
-    class RequestException(Exception):
-        pass
-
-    def __init__(self, response=None, should_raise=False):
-        self.response = response
+    def __init__(self, responses=None, should_raise=False):
+        self.responses = responses or []
         self.should_raise = should_raise
-        self.last_request = None
+        self.calls = []
 
     def get(self, url, params=None, timeout=None):
-        self.last_request = {
+        if self.should_raise:
+            raise Exception("Network error")
+
+        self.calls.append({
             "url": url,
             "params": params,
             "timeout": timeout,
-        }
+        })
 
-        if self.should_raise:
-            raise HttpClientMock.RequestException("Network error")
+        if not self.responses:
+            raise Exception("No more mock responses")
 
-        return self.response
+        return self.responses.pop(0)

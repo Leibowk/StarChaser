@@ -1,4 +1,3 @@
-from datetime import datetime, time, timedelta
 import requests
 from typing import Optional
 from services.date_time_service import DateTimeService
@@ -15,7 +14,7 @@ class WeatherApiService:
         self.timeout = 5  # seconds
         self.datetimeservice = DateTimeService()
 
-    def get_forecast_weather(self, lat: float, lon: float, time_visibility: Optional[TimeVisibility]) -> Optional[Weather]:
+    def get_forecast_weather(self, lat: float, lon: float, time_visibility: Optional[TimeVisibility] = None) -> Optional[Weather]:
         """
         Fetches forecast weather for a lat/lon and returns a Weather model.
         """
