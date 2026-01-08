@@ -38,7 +38,7 @@ Migrations and seeding data:
 ```bash
 cd backend
 alembic upgrade head
-python -m scripts.seed.seed_sites
+python -m scripts.seed_sites
 ```
 
 Install backend dependencies:

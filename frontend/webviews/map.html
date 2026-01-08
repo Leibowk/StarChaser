@@ -103,14 +103,32 @@
       }
     );
 
+    // Star visibility layer
+    const visibility2024 = L.tileLayer(
+      `${window.__API_URL__}/tiles/visibility2024/tile_{z}_{x}_{y}.png`,
+      {
+        minZoom: 2,
+        maxNativeZoom: 8,
+        maxZoom: 19,
+        tileSize: 1024,
+        zoomOffset: -2,
+        opacity: 0.7  // slightly higher so it’s more visible by default
+      }
+    );
+
     const map = L.map('map', {
       center: [48.75, -122.52],
       zoom: 9,
-      layers: [osm, light2024],
+      layers: [osm, visibility2024],
       worldCopyJump: true
     });
 
-    L.control.layers({ OpenStreetMap: osm }, { '2024 Light Pollution': light2024 }).addTo(map);
+    L.control.layers({ OpenStreetMap: osm },   
+    {
+      '2024 Light Pollution': light2024,
+      '2024 Star Visibility': visibility2024
+    }
+    ).addTo(map);
 
     const parkLayer = L.layerGroup().addTo(map);
 
