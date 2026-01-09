@@ -1,5 +1,6 @@
-from typing import Union
-from shapely.geometry import Polygon, MultiPolygon, shape
+import json
+from shapely import unary_union
+from shapely.geometry import shape, mapping
 import requests
 from config import settings
 
@@ -10,7 +11,7 @@ class DriveTimeService:
         self.api_key = settings.DRIVE_TIME_API.API_KEY
         self.timeout = 5
 
-    def get_drive_time_polygon(self, lat: float, lon: float, minutes: int) -> Union[Polygon, MultiPolygon]:
+    def get_drive_time_polygon(self, lat: float, lon: float, minutes: int) -> str:
         headers = {
             "Authorization": self.api_key,
             "Content-Type": "application/json",
@@ -25,6 +26,11 @@ class DriveTimeService:
         resp.raise_for_status()
         data = resp.json()
 
-        # Extract first polygon geometry
-        geometry = data["features"][0]["geometry"]
-        return shape(geometry)
+        if not data.get("features"):
+            raise ValueError("Drive-time API returned no polygons")
+
+        # Merge all features in case API returns multiple ranges
+        polygons = [shape(f["geometry"]) for f in data["features"]]
+        merged_polygon = unary_union(polygons)
+
+        return json.dumps(mapping(merged_polygon))

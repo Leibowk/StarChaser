@@ -1,4 +1,3 @@
-import json
 from typing import Optional
 from enums.time_visibility import TimeVisibility
 from enums.site_visibility import SiteVisibility
@@ -9,7 +8,6 @@ from services.light_pollution_service import LightPollutionService
 from services.drive_time_service import DriveTimeService
 from models.site import Site
 from models.site_summary import SiteSummary
-from shapely.geometry import mapping
 
 class SiteService:
     def __init__(self):
@@ -71,12 +69,7 @@ class SiteService:
 
             polygon = self.drive_service.get_drive_time_polygon(lat, lon, drive_time)
 
-        polygon_geojson = None
-
-        if polygon is not None:
-            polygon_geojson = polygon_geojson = json.dumps(mapping(polygon))
-
-        rows = self.site_repo.search(name, lat, lon, radius_km, polygon_geojson)
+        rows = self.site_repo.search(name, lat, lon, radius_km, polygon)
         
         sites = []
 
