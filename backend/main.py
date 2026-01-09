@@ -73,6 +73,10 @@ def search(
     lat: Optional[float] = None,
     lon: Optional[float] = None,
     radius_km: Optional[float] = None,
+    drive_time: Optional[int] = Query(
+        None,
+        description="Drive time to site in minutes"
+    ),
     visib: Optional[SiteVisibility] = Query(
         None,
         description="Overall site visibility rating",
@@ -81,4 +85,10 @@ def search(
         TimeVisibility.TONIGHT,
         description="Time window used to evaluate site visibility"
     )) -> list[Site]:
-    return site_service.search(name, lat, lon, radius_km, visib, time)
+    return site_service.search(name, 
+                               lat, 
+                               lon, 
+                               radius_km, 
+                               drive_time, 
+                               visib, 
+                               time)

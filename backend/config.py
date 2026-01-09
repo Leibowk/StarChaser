@@ -23,6 +23,7 @@ class Settings(BaseSettings):
     POSTGRES: PostgresSettings
     WEATHER_API: ApiSettings
     OPEN_WEATHER_MAP: ApiSettings
+    DRIVE_TIME_API: ApiSettings
     Secrets: SecretSettings
 
 

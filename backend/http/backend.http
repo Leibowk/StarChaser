@@ -25,5 +25,5 @@ GET {{url}}sites/search?visib={{vis}}&api_key={{api_key}}
 Accept: application/json
 
 ###Search more
-GET {{url}}sites/search?visib={{vis}}&lat=48.7406018&lon=-122.4692029&radius_km=50&time={{time}}&api_key={{api_key}}
+GET {{url}}sites/search?visib={{vis}}&lat=48.7405795&lon=-122.4691099&drive_time=4&time={{time}}&api_key={{api_key}}
 Accept: application/json

@@ -37,7 +37,8 @@ class SiteRepository:
         name: Optional[str] = None,
         lat: Optional[float] = None,
         lon: Optional[float] = None,
-        radius_km: Optional[float] = None) -> list[SiteDB]:
+        radius_km: Optional[float] = None,
+        drive_time_polygon: Optional[dict] = None) -> list[SiteDB]:
 
         query = select(
             SiteDB.id,
@@ -67,6 +68,19 @@ class SiteRepository:
                     SiteDB.geom,
                     point,
                     radius_meters
+                )
+            )
+
+        if drive_time_polygon is not None:
+            polygon_geom = func.ST_SetSRID(
+                func.ST_GeomFromGeoJSON(drive_time_polygon),
+                4326
+            )
+
+            filters.append(
+                func.ST_Intersects(
+                    SiteDB.geom,
+                    polygon_geom
                 )
             )
 
