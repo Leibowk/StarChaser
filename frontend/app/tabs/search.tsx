@@ -22,6 +22,7 @@ export default function SearchScreen() {
         ...(params.lon !== undefined ? { lon: String(params.lon) } : {}),
         ...(params.radius_km !== undefined ? { radius_km: String(params.radius_km) } : {}),
         ...(params.visib ? params.visib === 'Any' ? { visib: 'Terrible' } : { visib: String(params.visib) } : {}),
+        ...(params.time !== undefined ? { time: String(params.time) } : {}),
       }).toString();
 
       const rawResults = await apiFetch(`/sites/search?${query}`);
