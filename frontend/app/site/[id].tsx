@@ -18,11 +18,13 @@ import { Picker } from '@react-native-picker/picker';
 type TimeOption = typeof TIME_OPTIONS[number];
 
 export default function SiteDetailScreen() {
-  const { id } = useLocalSearchParams<{ id: string }>();
+  const { id, time } = useLocalSearchParams<{ id: string; time?: string }>();
   const [site, setSite] = useState<Site | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [timeVisibility, setTimeVisibility] = useState<TimeOption>('Tonight');
+  const [timeVisibility, setTimeVisibility] = useState<TimeOption>(
+    (time as TimeOption) ?? 'Tonight'
+  );
   const navigation = useNavigation();
   const insets = useSafeAreaInsets();
 
@@ -41,7 +43,7 @@ useEffect(() => {
     }
   }
   fetchSite();
-}, [id, navigation, timeVisibility]);
+}, [id, timeVisibility]);
 
   if (loading) return <ActivityIndicator />;
   if (error) return <Text>Error: {error}</Text>;

@@ -10,10 +10,12 @@ import { useRouter } from 'expo-router';
 export default function SearchScreen() {
   const [results, setResults] = useState<Site[]>([]);
   const [loading, setLoading] = useState(false);
+  const [searchTime, setSearchTime] = useState<string | undefined>(undefined);
   const router = useRouter();
 
   const handleSearch = async (params: SearchParams) => {
     setLoading(true);
+    setSearchTime(params.time);
     try {
       // Build query string
       const query = new URLSearchParams({
@@ -56,7 +58,12 @@ export default function SearchScreen() {
           keyExtractor={(item) => item.id.toString()}
           renderItem={({ item }) => (
             <TouchableOpacity
-              onPress={() => router.push(`/site/${item.id}`)}
+              onPress={() =>
+                router.push({
+                  pathname: `/site/${item.id}`,
+                  params: { time: searchTime },
+                })
+              }
               style={styles.itemCard}
             >
               <Text style={styles.itemTitle}>{item.name}</Text>
