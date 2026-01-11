@@ -8,7 +8,7 @@ export type SearchParams = {
   name?: string;
   lat?: number;
   lon?: number;
-  radius_km?: number;
+  drive_time?: number;
   visib?: string;
   time?: string;
 };
@@ -33,8 +33,8 @@ type TimeOption = typeof TIME_OPTIONS[number];
 
 export const SearchPanel = ({ onSearch }: Props) => {
   const [name, setName] = useState('');
-  const [useLocation, setUseLocation] = useState(false);
-  const [radiusKm, setRadiusKm] = useState('50');
+  const [useLocation, setUseLocation] = useState(true);
+  const [driveTime, setDriveTime] = useState('60');
   const [siteVisib, setSiteVisib] = useState<VisibilityOption>('Any');
   const [timeVisibility, setTimeVisibility] = useState<TimeOption>('Tonight');
   const [locationGranted, setLocationGranted] = useState(false);
@@ -84,7 +84,7 @@ export const SearchPanel = ({ onSearch }: Props) => {
       lon,
       visib: siteVisib !== 'Any' ? siteVisib : undefined,
       time: timeVisibility,
-      ...(useLocation && lat != null && lon != null ? { radius_km: parseFloat(radiusKm) } : {}),
+      ...(useLocation && lat != null && lon != null ? { drive_time: parseFloat(driveTime) } : {}),
     };
 
     try {
@@ -115,13 +115,13 @@ export const SearchPanel = ({ onSearch }: Props) => {
 
       {useLocation && (
         <>
-          <Text style={styles.label}>Radius (km):</Text>
+          <Text style={styles.label}>Drive Time (minutes):</Text>
           <TextInput
             style={styles.input}
-            value={radiusKm}
-            onChangeText={setRadiusKm}
+            value={driveTime}
+            onChangeText={setDriveTime}
             keyboardType="numeric"
-            placeholder="Enter radius in km"
+            placeholder="Enter drive time in minutes"
             placeholderTextColor="#ccc"
           />
         </>

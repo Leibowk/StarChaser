@@ -22,7 +22,7 @@ export default function SearchScreen() {
         ...(params.name ? { name: params.name } : {}),
         ...(params.lat !== undefined ? { lat: String(params.lat) } : {}),
         ...(params.lon !== undefined ? { lon: String(params.lon) } : {}),
-        ...(params.radius_km !== undefined ? { radius_km: String(params.radius_km) } : {}),
+        ...(params.drive_time !== undefined ? { drive_time: String(params.drive_time) } : {}),
         ...(params.visib ? params.visib === 'Any' ? { visib: 'Terrible' } : { visib: String(params.visib) } : {}),
         ...(params.time !== undefined ? { time: String(params.time) } : {}),
       }).toString();
