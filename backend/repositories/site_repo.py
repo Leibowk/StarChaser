@@ -35,9 +35,6 @@ class SiteRepository:
     def search(
         self,
         name: Optional[str] = None,
-        lat: Optional[float] = None,
-        lon: Optional[float] = None,
-        radius_km: Optional[float] = None,
         drive_time_polygon: Optional[dict] = None) -> list[SiteDB]:
 
         query = select(
@@ -53,23 +50,6 @@ class SiteRepository:
         # --- Name filter (case-insensitive contains) ---
         if name:
             filters.append(SiteDB.name.ilike(f"%{name}%"))
-
-        # --- Radius filter (only if all 3 present) ---
-        if lat is not None and lon is not None and radius_km is not None:
-            radius_meters = radius_km * 1000
-
-            point = func.ST_SetSRID(
-                func.ST_MakePoint(lon, lat),
-                4326
-            )
-
-            filters.append(
-                func.ST_DWithin(
-                    SiteDB.geom,
-                    point,
-                    radius_meters
-                )
-            )
 
         if drive_time_polygon is not None:
             polygon_geom = func.ST_SetSRID(

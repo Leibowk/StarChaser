@@ -72,7 +72,6 @@ def search(
     name: Optional[str] = None,
     lat: Optional[float] = None,
     lon: Optional[float] = None,
-    radius_km: Optional[float] = None,
     drive_time: Optional[int] = Query(
         None,
         description="Drive time to site in minutes"
@@ -85,10 +84,12 @@ def search(
         TimeVisibility.TONIGHT,
         description="Time window used to evaluate site visibility"
     )) -> list[Site]:
+    if drive_time is not None and (lat is None or lon is None):
+        raise ValueError("lat/lon required when using drive_time")
+        
     return site_service.search(name, 
                                lat, 
                                lon, 
-                               radius_km, 
                                drive_time, 
                                visib, 
                                time)

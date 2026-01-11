@@ -53,23 +53,15 @@ class SiteService:
         name: Optional[str] = None,
         lat: Optional[float] = None,
         lon: Optional[float] = None,
-        radius_km: Optional[float] = None,
         drive_time: Optional[int] = None,
         visib: Optional[SiteVisibility] = None,
         time: Optional[TimeVisibility] = None) -> list[Site]:
 
         polygon = None
 
-        if drive_time is not None:
-            if lat is None or lon is None:
-                raise ValueError("lat/lon required when using drive_time")
+        polygon = self.drive_service.get_drive_time_polygon(lat, lon, drive_time)
 
-            if radius_km is not None:
-                raise ValueError("Use either radius_km or drive_time, not both")
-
-            polygon = self.drive_service.get_drive_time_polygon(lat, lon, drive_time)
-
-        rows = self.site_repo.search(name, lat, lon, radius_km, polygon)
+        rows = self.site_repo.search(name, polygon)
         
         sites = []
 
