@@ -7,5 +7,5 @@ class SiteSummary(BaseModel):
     latitude: float
     longitude: float
     name: str
-    description: str
+    description: Optional[str]
     light_pollution: Optional[LightPollution]
