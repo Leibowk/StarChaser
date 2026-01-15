@@ -2,13 +2,12 @@ from logging.config import fileConfig
 
 from sqlalchemy import engine_from_config
 from sqlalchemy import pool
-from geoalchemy2 import Geometry, Geography
+from geoalchemy2 import alembic_helpers
 
 from alembic import context
 from config import settings
 from db import Base
 from models.site_db import Base
-import models
 
 # this is the Alembic Config object, which provides
 # access to the values within the .ini file in use.
@@ -30,6 +29,17 @@ if config.config_file_name is not None:
 # from myapp import mymodel
 # target_metadata = mymodel.Base.metadata
 target_metadata = Base.metadata
+
+# --- include_object filter to ignore system tables like spatial_ref_sys ---
+def include_object(obj, name, type_, reflected, compare_to):
+    # obj is the Table or other object
+    # type_ is 'table', 'column', etc
+    # reflected is True if it came from the database
+    # compare_to is the model Table object if available
+    # Only include tables that are not system/PostGIS tables
+    if type_ == "table" and name in ("spatial_ref_sys",):
+        return False
+    return alembic_helpers.include_object(obj, name, type_, reflected, compare_to)
 
 # other values from the config, defined by the needs of env.py,
 # can be acquired:
@@ -55,6 +65,9 @@ def run_migrations_offline() -> None:
         target_metadata=target_metadata,
         literal_binds=True,
         dialect_opts={"paramstyle": "named"},
+        include_object=include_object,
+        process_revision_directives=alembic_helpers.writer,
+        render_item=alembic_helpers.render_item,
     )
 
     with context.begin_transaction():
@@ -78,6 +91,9 @@ def run_migrations_online() -> None:
         context.configure(
             connection=connection, 
             target_metadata=target_metadata,
+            include_object=include_object,
+            process_revision_directives=alembic_helpers.writer,
+            render_item=alembic_helpers.render_item,
         )
 
         with context.begin_transaction():
