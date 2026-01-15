@@ -8,8 +8,8 @@ from enums.time_visibility import TimeVisibility
 from enums.site_visibility import SiteVisibility
 from services.site_service import SiteService
 from fastapi.staticfiles import StaticFiles
-from models.site import Site
-from models.site_summary import SiteSummary
+from schemas.site import Site
+from schemas.site_summary import SiteSummary
 import os
 from config import settings
 

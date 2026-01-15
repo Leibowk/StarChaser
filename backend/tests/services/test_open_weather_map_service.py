@@ -1,5 +1,5 @@
 from services.open_weather_map_service import OpenWeatherMapService
-from models.weather import Weather
+from schemas.weather import Weather
 from enums.time_visibility import TimeVisibility
 from tests.mocks.http import ResponseMock, HttpClientMock
 from datetime import datetime, timezone

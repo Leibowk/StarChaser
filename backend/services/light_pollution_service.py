@@ -1,7 +1,7 @@
 import math
 import gzip
 import numpy as np
-from models.light_pollution import LightPollution
+from schemas.light_pollution import LightPollution
 from pathlib import Path
 
 TILE_DIR = Path(__file__).resolve().parent.parent / "binary_tiles"

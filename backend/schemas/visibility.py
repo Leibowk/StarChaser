@@ -1,8 +1,8 @@
 from typing import Optional
 from pydantic import BaseModel
 from enums.site_visibility import SiteVisibility
-from models.weather import Weather
-from models.light_pollution import LightPollution
+from schemas.weather import Weather
+from schemas.light_pollution import LightPollution
 
 class Visibility(BaseModel):
     score: float

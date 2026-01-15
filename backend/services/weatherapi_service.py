@@ -3,7 +3,7 @@ from typing import Optional
 from services.date_time_service import DateTimeService
 from enums.time_visibility import TimeVisibility
 from config import settings
-from models.weather import Weather
+from schemas.weather import Weather
 
 
 class WeatherApiService:

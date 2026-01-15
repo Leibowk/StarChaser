@@ -3,7 +3,7 @@ import pytest
 import numpy as np
 from unittest.mock import patch, mock_open
 from services.light_pollution_service import LightPollutionService
-from models.light_pollution import LightPollution
+from schemas.light_pollution import LightPollution
 
 @pytest.fixture
 def lp_service():

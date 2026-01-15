@@ -1,7 +1,7 @@
 import pytest
 from services.site_service import SiteService
-from models.site import Site
-from models.site_summary import SiteSummary
+from schemas.site import Site
+from schemas.site_summary import SiteSummary
 from tests.mocks.services import LPServiceMock, WeatherApiServiceMock, VisibilityServiceMock
 from tests.mocks.repos import SiteRepoMock
 

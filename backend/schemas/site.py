@@ -1,11 +1,11 @@
 from pydantic import BaseModel
 from typing import Optional
-from models.light_pollution import LightPollution
+from schemas.visibility import Visibility
 
-class SiteSummary(BaseModel):
+class Site(BaseModel):
     id: int
     latitude: float
     longitude: float
     name: str
     description: Optional[str]
-    light_pollution: Optional[LightPollution]
+    visibility: Optional[Visibility]

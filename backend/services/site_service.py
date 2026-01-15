@@ -1,13 +1,13 @@
 from typing import Optional
 from enums.time_visibility import TimeVisibility
 from enums.site_visibility import SiteVisibility
-from models.visibility import Visibility
+from schemas.visibility import Visibility
 from repositories.site_repo import SiteRepository
 from services.visibility_service import VisibilityService
 from services.light_pollution_service import LightPollutionService
 from services.drive_time_service import DriveTimeService
-from models.site import Site
-from models.site_summary import SiteSummary
+from schemas.site import Site
+from schemas.site_summary import SiteSummary
 
 class SiteService:
     def __init__(self):

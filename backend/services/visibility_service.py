@@ -2,10 +2,10 @@
 
 from typing import Optional
 from enums.time_visibility import TimeVisibility
-from models.light_pollution import LightPollution
-from models.weather import Weather
+from schemas.light_pollution import LightPollution
+from schemas.weather import Weather
 from enums.site_visibility import SiteVisibility
-from models.visibility import Visibility
+from schemas.visibility import Visibility
 from services.light_pollution_service import LightPollutionService
 from services.open_weather_map_service import OpenWeatherMapService
 
