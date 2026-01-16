@@ -1,8 +1,12 @@
 # StarChaser 🌌
 
-StarChaser is a full-stack application built with a React Native Expo frontend and a FastAPI backend, backed by PostgreSQL + PostGIS.
+**The Premier Star Gazing Site Visibility App**
+
+StarChaser helps you find the best nearby locations for experiencing dark, clear skies. 
 
 ## Tech Stack
+
+StarChaser is a full-stack application with a React Native Expo frontend and a FastAPI backend, powered by PostgreSQL + PostGIS.
 
 Frontend  
 - React Native  
@@ -108,6 +112,12 @@ Enjoy!
 ## Notes
 
 Can either run frontend on Expo Go from your phone or download an emulator like BlueStacks and use Expo Go there.
+
+FastAPI Best Practice Resources:
+
+https://fastapi.tiangolo.com/learn/ (main site)
+
+https://github.com/zhanymkanov/fastapi-best-practices (good community repo)
 
 
 ## Troubleshooting
