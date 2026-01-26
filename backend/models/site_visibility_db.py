@@ -1,8 +1,6 @@
-from sqlalchemy import Column, Index, Integer, Float, ForeignKey, TIMESTAMP, JSON, Enum, func
+from sqlalchemy import Column, Date, Index, Integer, Float, ForeignKey, TIMESTAMP, JSON, Enum, func
 from db import Base
 from models.site_db import SiteDB
-from enums.site_visibility import SiteVisibility
-from enums.time_visibility import TimeVisibility
 
 class SiteVisibilityDB(Base):
     __tablename__ = "site_visibility"
@@ -13,8 +11,7 @@ class SiteVisibilityDB(Base):
 
     # core visibility
     score = Column(Float, nullable=False, index=True)
-    time_bucket = Column(Enum(TimeVisibility), nullable=False, index=True)
-    category = Column(Enum(SiteVisibility), nullable=False)
+    date = Column(Date, nullable=False, index=True)
 
     # complex data stored as JSON
     light_pollution = Column(JSON, nullable=True)
@@ -24,7 +21,7 @@ class SiteVisibilityDB(Base):
     updated_at = Column(TIMESTAMP, server_default=func.now(), onupdate=func.now())
 
     __table_args__ = (
-        Index("ix_site_visibility_time_bucket", "time_bucket"),
+        Index("ix_site_visibility_date", "date"),
         Index("ix_site_visibility_score", "score"),
-        Index("ix_site_visibility_time_score", "time_bucket", "score"),
+        Index("ix_site_visibility_date_score", "date", "score"),
     )
