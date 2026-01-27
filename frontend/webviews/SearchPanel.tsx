@@ -34,7 +34,20 @@ type TimeOption = typeof TIME_OPTIONS[number];
 export const SearchPanel = ({ onSearch }: Props) => {
   const [name, setName] = useState('');
   const [useLocation, setUseLocation] = useState(true);
-  const [driveTime, setDriveTime] = useState('60');
+  const [driveTime, setDriveTime] = useState('15');
+  const [driveTimeError, setDriveTimeError] = useState<string | null>(null);
+    const handleDriveTimeChange = (value: string) => {
+      // Only allow numbers and empty string
+      if (!/^\d*$/.test(value)) return;
+      const num = parseInt(value, 10);
+      if (value && (!Number.isNaN(num) && num > 60)) {
+        setDriveTimeError('Drive time cannot exceed 60 minutes.');
+        setDriveTime('60');
+      } else {
+        setDriveTimeError(null);
+        setDriveTime(value);
+      }
+    };
   const [siteVisib, setSiteVisib] = useState<VisibilityOption>('Any');
   const [timeVisibility, setTimeVisibility] = useState<TimeOption>('Tonight');
   const [locationGranted, setLocationGranted] = useState(false);
@@ -49,7 +62,7 @@ export const SearchPanel = ({ onSearch }: Props) => {
 }, [useLocation, locationGranted]);
 
   const handleSearch = async () => {
-    if (loading) return; // prevent double taps
+    if (loading || driveTimeError) return; // prevent double taps or error
     setLoading(true);
 
     let lat: number | undefined;
@@ -117,13 +130,17 @@ export const SearchPanel = ({ onSearch }: Props) => {
         <>
           <Text style={styles.label}>Drive Time (minutes):</Text>
           <TextInput
-            style={styles.input}
+            style={[styles.input, driveTimeError && { borderColor: 'red' }]}
             value={driveTime}
-            onChangeText={setDriveTime}
+            onChangeText={handleDriveTimeChange}
             keyboardType="numeric"
             placeholder="Enter drive time in minutes"
             placeholderTextColor="#ccc"
+            maxLength={2}
           />
+          {driveTimeError && (
+            <Text style={styles.errorText}>{driveTimeError}</Text>
+          )}
         </>
       )}
 
@@ -156,9 +173,9 @@ export const SearchPanel = ({ onSearch }: Props) => {
       
       <TouchableOpacity
         onPress={handleSearch}
-        activeOpacity={0.6} // decreases opacity when pressed
+        activeOpacity={0.6}
         style={styles.searchButton}
-        disabled={loading} // disable while searching
+        disabled={loading || !!driveTimeError}
       >
         <Text style={styles.searchButtonText}>{loading ? 'Searching...' : 'Search'}</Text>
       </TouchableOpacity>
@@ -215,5 +232,11 @@ const styles = StyleSheet.create({
     color: '#000',
     fontWeight: 'bold',
     fontSize: 16,
+  },
+  errorText: {
+    color: 'red',
+    marginTop: 4,
+    marginBottom: 4,
+    fontWeight: 'bold',
   },
 });
