@@ -15,17 +15,15 @@ import logging
 import time
 
 class SiteService:
-
     def __init__(self):
         self.site_repo = SiteRepository()
         self.lp_service = LightPollutionService()
         self.visibility_service = VisibilityService()
         self.drive_service = DriveTimeService()
 
-    def get_all_sites(self) -> list[SiteSummary]:
-        rows = self.site_repo.get_all_sites()
+    async def get_all_sites(self) -> list[SiteSummary]:
+        rows = await self.site_repo.get_all_sites()
         sites = []
-
         for r in rows:
             lp = self.lp_service.get_for_location(r.latitude, r.longitude)
             sites.append(
@@ -40,22 +38,22 @@ class SiteService:
             )
         return sites
 
-    def get_site(self, site_id: int, time: TimeVisibility) -> Site:
-        r = self.site_repo.get_site(site_id)
+    async def get_site(self, site_id: int, time: TimeVisibility) -> Site:
+        r = await self.site_repo.get_site(site_id)
         if not r:
             return None
 
         night_date = self.resolve_night_date(time)
-        vis_record = self.site_repo.get_visibility(site_id, night_date)
+        vis_record = await self.site_repo.get_visibility(site_id, night_date)
         if vis_record:
             visibility = Visibility(
                 score=vis_record.score,
                 category=VisibilityService.category_from_score(vis_record.score),
                 weather=Weather(**vis_record.weather) if vis_record.weather else None,
                 light_pollution=LightPollution(**vis_record.light_pollution) if vis_record.light_pollution else None
-                )
+            )
         else:
-            visibility = self.visibility_service.compute_visibility(r.latitude, r.longitude, time)
+            visibility = await self.visibility_service.compute_visibility(r.latitude, r.longitude, time)
 
         return Site(
             id=r.id,
@@ -65,7 +63,7 @@ class SiteService:
             longitude=r.longitude,
             visibility=visibility)
 
-    def search(
+    async def search(
         self,
         visib: SiteVisibility,
         time: TimeVisibility,
@@ -73,17 +71,15 @@ class SiteService:
         lat: Optional[float] = None,
         lon: Optional[float] = None,
         drive_time: Optional[int] = None
-        ) -> list[Site]:
-
+    ) -> list[Site]:
         polygon = None
-
         if drive_time is not None:
-            polygon = self.drive_service.get_drive_time_polygon(lat, lon, drive_time)
+            polygon = await self.drive_service.get_drive_time_polygon(lat, lon, drive_time)
 
         night_date = self.resolve_night_date(time)
-        min_score = self.visibility_service.score_from_category(visib)            
+        min_score = self.visibility_service.score_from_category(visib)
 
-        rows = self.site_repo.search(name, polygon, night_date, min_score)
+        rows = await self.site_repo.search(name, polygon, night_date, min_score)
         sites = []
         for r in rows:
             visibility = Visibility(
@@ -102,12 +98,11 @@ class SiteService:
                     visibility=visibility
                 )
             )
-
         return sites
     
-    def precompute_visibility(self, time_buckets):
+    async def precompute_visibility(self, time_buckets):
         logger = logging.getLogger(__name__)
-        sites = self.site_repo.get_all_sites()
+        sites = await self.site_repo.get_all_sites()
         total_sites = len(sites)
         logger.info(f"Starting precompute for {total_sites} sites and {len(time_buckets)} time buckets")
 
@@ -116,7 +111,7 @@ class SiteService:
 
         for i, s in enumerate(sites):
             try:
-                visibilities = self.visibility_service.compute_visibilities(s.latitude, s.longitude, time_buckets)
+                visibilities = await self.visibility_service.compute_visibilities(s.latitude, s.longitude, time_buckets)
                 for t in time_buckets:
                     visibility = visibilities.get(t)
                     if visibility:
@@ -139,7 +134,7 @@ class SiteService:
                 logger.info(f"Processed {i + 1}/{total_sites} sites")
 
         logger.info(f"Computed {processed} visibility records, upserting to DB")
-        self.site_repo.upsert_visibility(records)
+        await self.site_repo.upsert_visibility(records)
         logger.info("Precompute visibility completed")
 
     @staticmethod

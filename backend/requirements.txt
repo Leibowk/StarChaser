@@ -2,9 +2,9 @@ fastapi
 uvicorn
 pydantic
 pydantic-settings
-sqlalchemy
+sqlalchemy[asyncio]
 alembic
-psycopg2-binary
+asyncpg
 requests
 GeoAlchemy2
 shapely
@@ -12,3 +12,4 @@ pytest
 slowapi
 pillow
 apscheduler
+httpx

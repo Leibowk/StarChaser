@@ -1,15 +1,11 @@
 import pytest
-
-from tests.mocks.services import LPServiceMock, OpenWeatherMapServiceMock
-from services.visibility_service import VisibilityService
+from backend.services.visibility_service import VisibilityService
+from ..mocks.services import LPServiceMock, OpenWeatherMapServiceMock
 from enums.site_visibility import SiteVisibility
 from enums.time_visibility import TimeVisibility
 from schemas.visibility import Visibility
 from schemas.light_pollution import LightPollution
 from schemas.weather import Weather
-
-
-
 
 
 # ---------------------------------------------------------------------------
@@ -28,8 +24,10 @@ def visibility_service():
 # Integration tests
 # ---------------------------------------------------------------------------
 
-def test_compute_visibility_returns_visibility(visibility_service):
-    result = visibility_service.compute_visibility(
+
+@pytest.mark.asyncio
+async def test_compute_visibility_returns_visibility(visibility_service):
+    result = await visibility_service.compute_visibility(
         lat=48.75,
         long=-122.48,
         time_visibility=TimeVisibility.TONIGHT

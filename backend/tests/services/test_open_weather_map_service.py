@@ -1,8 +1,9 @@
 from services.open_weather_map_service import OpenWeatherMapService
 from schemas.weather import Weather
 from enums.time_visibility import TimeVisibility
-from tests.mocks.http import ResponseMock, HttpClientMock
+from ..mocks.http import ResponseMock, HttpClientMock
 from datetime import datetime, timezone
+import pytest
 
 FORECAST_JSON = {
     "list": [
@@ -25,7 +26,8 @@ AIR_JSON = {
 }
 
 class TestOpenWeatherMapService:
-    def test_get_forecast_weather_success(self, monkeypatch):
+    @pytest.mark.asyncio
+    async def test_get_forecast_weather_success(self, monkeypatch):
         # Freeze datetime helper
         fixed_dt = datetime.fromtimestamp(1700000000, tz=timezone.utc)
 
@@ -43,7 +45,7 @@ class TestOpenWeatherMapService:
 
         service = OpenWeatherMapService(http_client=http_client)
 
-        result = service.get_forecast_weather(
+        result = await service.get_forecast_weather(
             lat=48.75,
             lon=-122.48,
             time_visibility=TimeVisibility.TONIGHT
@@ -56,7 +58,8 @@ class TestOpenWeatherMapService:
         assert result.condition == "clear sky"
         assert result.aqi == 1
 
-    def test_get_forecast_weather_missing_entries(self, monkeypatch):
+    @pytest.mark.asyncio
+    async def test_get_forecast_weather_missing_entries(self, monkeypatch):
         fixed_dt = datetime.fromtimestamp(1700000000, tz=timezone.utc)
 
         monkeypatch.setattr(
@@ -73,13 +76,13 @@ class TestOpenWeatherMapService:
 
         service = OpenWeatherMapService(http_client=http_client)
 
-        result = service.get_forecast_weather(
+        result = await service.get_forecast_weather(
             0.0, 0.0, TimeVisibility.TONIGHT
         )
-
         assert result is None
 
-    def test_get_forecast_weather_http_error(self):
+    @pytest.mark.asyncio
+    async def test_get_forecast_weather_http_error(self):
         http_client = HttpClientMock(
             responses=[
                 ResponseMock({}, status_code=500)
@@ -88,23 +91,23 @@ class TestOpenWeatherMapService:
 
         service = OpenWeatherMapService(http_client=http_client)
 
-        result = service.get_forecast_weather(
+        result = await service.get_forecast_weather(
             48.75, -122.48, TimeVisibility.TONIGHT
         )
-
         assert result is None
 
-    def test_get_forecast_weather_network_error(self):
+    @pytest.mark.asyncio
+    async def test_get_forecast_weather_network_error(self):
         http_client = HttpClientMock(should_raise=True)
         service = OpenWeatherMapService(http_client=http_client)
 
-        result = service.get_forecast_weather(
+        result = await service.get_forecast_weather(
             48.75, -122.48, TimeVisibility.TONIGHT
         )
-
         assert result is None
 
-    def test_weather_request_params(self, monkeypatch):
+    @pytest.mark.asyncio
+    async def test_weather_request_params(self, monkeypatch):
         fixed_dt = datetime.fromtimestamp(1700000000, tz=timezone.utc)
 
         monkeypatch.setattr(
@@ -120,10 +123,8 @@ class TestOpenWeatherMapService:
         )
 
         service = OpenWeatherMapService(http_client=http_client)
-        service.get_forecast_weather(10.5, 20.5, TimeVisibility.TONIGHT)
-
+        await service.get_forecast_weather(10.5, 20.5, TimeVisibility.TONIGHT)
         forecast_call = http_client.calls[0]
-
         assert forecast_call["params"]["lat"] == 10.5
         assert forecast_call["params"]["lon"] == 20.5
         assert forecast_call["params"]["units"] == "metric"

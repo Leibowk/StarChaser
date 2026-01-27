@@ -1,5 +1,3 @@
-
-
 from typing import Optional
 from enums.time_visibility import TimeVisibility
 from schemas.light_pollution import LightPollution
@@ -25,15 +23,11 @@ class VisibilityService:
         SiteVisibility.Terrible: 0
     }
 
-    def compute_visibility(self, lat, long, time_visibility: Optional[TimeVisibility] = None) -> Visibility:
-
+    async def compute_visibility(self, lat, long, time_visibility: Optional[TimeVisibility] = None) -> Visibility:
         lp = self.lp_service.get_for_location(lat, long)
-        weather = self.weather_service.get_forecast_weather(lat, long, time_visibility)
-        
+        weather = await self.weather_service.get_forecast_weather(lat, long, time_visibility)
         score = self.compute_score(lp, weather)
-
         category = self.category_from_score(score)
-
         return Visibility(
             score=score,
             category=category,
@@ -41,10 +35,9 @@ class VisibilityService:
             weather=weather,
         )
 
-    def compute_visibilities(self, lat, long, times: list[TimeVisibility]) -> dict[TimeVisibility, Visibility]:
+    async def compute_visibilities(self, lat, long, times: list[TimeVisibility]) -> dict[TimeVisibility, Visibility]:
         lp = self.lp_service.get_for_location(lat, long)
-        weathers = self.weather_service.get_forecast_weathers(lat, long, times)
-
+        weathers = await self.weather_service.get_forecast_weathers(lat, long, times)
         result = {}
         for t in times:
             weather = weathers.get(t)

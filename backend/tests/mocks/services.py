@@ -12,7 +12,7 @@ class WeatherApiServiceMock:
         return Weather(cloud_coverage=50, avgvis_km=10.0, avgvis_miles=6.2, condition="Clear", aqi=1)
     
 class OpenWeatherMapServiceMock:
-    def get_forecast_weather(self, lat, lon, time_visibility=None):
+    async def get_forecast_weather(self, lat, lon, time_visibility=None):
         return Weather(
             cloud_coverage=10,      # %
             avgvis_km=12.0,         # km
@@ -22,7 +22,7 @@ class OpenWeatherMapServiceMock:
         )
     
 class VisibilityServiceMock:
-    def compute_visibility(self, lat, long, time_visibility) -> Visibility:
+    async def compute_visibility(self, lat, long, time_visibility) -> Visibility:
         return Visibility(
             score=0.85,
             category=SiteVisibility.Great,

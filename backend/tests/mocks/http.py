@@ -3,7 +3,10 @@ class ResponseMock:
         self._json_data = json_data
         self.status_code = status_code
 
-    def json(self):
+    async def json(self):
+        return self._json_data
+
+    def json_sync(self):
         return self._json_data
 
     def raise_for_status(self):
@@ -17,7 +20,7 @@ class HttpClientMock:
         self.should_raise = should_raise
         self.calls = []
 
-    def get(self, url, params=None, timeout=None):
+    async def get(self, url, params=None, timeout=None):
         if self.should_raise:
             raise Exception("Network error")
 
@@ -30,4 +33,7 @@ class HttpClientMock:
         if not self.responses:
             raise Exception("No more mock responses")
 
-        return self.responses.pop(0)
+        resp = self.responses.pop(0)
+        # Patch for compatibility: mimic httpx.Response interface
+        resp.json = resp.json_sync
+        return resp

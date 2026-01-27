@@ -55,16 +55,16 @@ tiles_dir = os.path.join(os.path.dirname(__file__), "image_tiles")
 app.mount("/tiles", StaticFiles(directory=tiles_dir), name="tiles")
 
 @app.get("/sites", response_model=list[SiteSummary])
-def get_sites() -> list[SiteSummary]:
-    return site_service.get_all_sites()
+async def get_sites() -> list[SiteSummary]:
+    return await site_service.get_all_sites()
 
 @app.get("/site/{site_id}", response_model=Site)
-def get_site(site_id: int,
+async def get_site(site_id: int,
              time: Optional[TimeVisibility] = Query(
-                None,
+                TimeVisibility.TONIGHT,
                 description="Time window used to evaluate site visibility"
             )) -> Site:
-    return site_service.get_site(site_id, time)
+    return await site_service.get_site(site_id, time)
 
 @app.get(
         "/sites/search", 
@@ -76,7 +76,7 @@ def get_site(site_id: int,
             "- `lat`, `lon`, `radius_km`: return sites within a radius\n"
             "- Parameters may be combined (AND logic)"
         ))
-def search(
+async def search(
     name: Optional[str] = None,
     lat: Optional[float] = None,
     lon: Optional[float] = None,
@@ -95,7 +95,7 @@ def search(
     if drive_time is not None and (lat is None or lon is None):
         raise ValueError("lat/lon required when using drive_time")
         
-    return site_service.search(visib,
+    return await site_service.search(visib,
                                time,
                                name,
                                lat, 
@@ -103,9 +103,9 @@ def search(
                                drive_time)
 
 @app.post("/jobs/visibility/run")
-def run_visibility_job_now():
+async def run_visibility_job_now():
     site_service = SiteService()
-    site_service.precompute_visibility([
+    await site_service.precompute_visibility([
         TimeVisibility.TONIGHT,
         TimeVisibility.TOMORROW_NIGHT,
         TimeVisibility.NIGHTS_3_FROM_NOW,
