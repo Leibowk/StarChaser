@@ -12,10 +12,18 @@ from schemas.site import Site
 from schemas.site_summary import SiteSummary
 import os
 from config import settings
+from contextlib import asynccontextmanager
+from jobs.scheduler import start_scheduler
 
 swagger_api_key = APIKeyHeader(name="x-api-key", auto_error=False)
 
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    start_scheduler()
+    yield
+
 app = FastAPI(
+    lifespan=lifespan,
     dependencies=[Security(swagger_api_key)]
 )
 
@@ -77,7 +85,7 @@ def search(
         description="Drive time to site in minutes"
     ),
     visib: Optional[SiteVisibility] = Query(
-        None,
+        SiteVisibility.Terrible,
         description="Overall site visibility rating",
     ),
     time: Optional[TimeVisibility] = Query(
@@ -87,9 +95,19 @@ def search(
     if drive_time is not None and (lat is None or lon is None):
         raise ValueError("lat/lon required when using drive_time")
         
-    return site_service.search(name, 
+    return site_service.search(visib,
+                               time,
+                               name,
                                lat, 
                                lon, 
-                               drive_time, 
-                               visib, 
-                               time)
+                               drive_time)
+
+@app.post("/jobs/visibility/run")
+def run_visibility_job_now():
+    site_service = SiteService()
+    site_service.precompute_visibility([
+        TimeVisibility.TONIGHT,
+        TimeVisibility.TOMORROW_NIGHT,
+        TimeVisibility.NIGHTS_3_FROM_NOW,
+    ])
+    return {"status": "ok"}

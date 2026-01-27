@@ -99,3 +99,90 @@ class OpenWeatherMapService:
         except Exception as e:
             print(f"[OpenWeatherMapService] Error fetching weather: {e}")
             return None
+
+    def get_forecast_weathers(self, lat: float, lon: float, times: list[TimeVisibility]) -> dict[TimeVisibility, Weather]:
+        # Get target unix timestamps for each time
+        target_times = {t: int(self.datetimeservice.date_time_helper(t).timestamp()) for t in times}
+
+        # --- Weather Forecast ---
+        weather_params = {
+            "lat": lat,
+            "lon": lon,
+            "appid": self.api_key,
+            "units": "metric"
+        }
+
+        try:
+            # Fetch forecast once
+            weather_resp = self.http_client.get(
+                f"{self.base_url}forecast",
+                params=weather_params,
+                timeout=self.timeout,
+            )
+            weather_resp.raise_for_status()
+            weather_data = weather_resp.json()
+
+            # Fetch AQI once
+            air_resp = self.http_client.get(
+                f"{self.base_url}air_pollution/forecast",
+                params={
+                    "lat": lat,
+                    "lon": lon,
+                    "appid": self.api_key
+                },
+                timeout=self.timeout,
+            )
+            air_resp.raise_for_status()
+            air_data = air_resp.json()
+
+            result = {}
+            for time_vis, target_unix in target_times.items():
+                # Find nearest weather entry
+                best_item = None
+                diff = float("inf")
+                for item in weather_data.get("list", []):
+                    dt = item.get("dt")
+                    if dt is None:
+                        continue
+                    delta = abs(dt - target_unix)
+                    if delta < diff:
+                        diff = delta
+                        best_item = item
+
+                if not best_item:
+                    result[time_vis] = None
+                    continue
+
+                # Extract weather info
+                cloud_coverage = best_item.get("clouds", {}).get("all", 0)
+                avgvis_m = best_item.get("visibility", 0)
+                avgvis_km = avgvis_m / 1000.0
+                condition = best_item.get("weather", [{}])[0].get("description", "")
+
+                # Find nearest AQI entry
+                best_aqi = None
+                best_diff = float("inf")
+                for entry in air_data.get("list", []):
+                    dt = entry.get("dt")
+                    if dt is None:
+                        continue
+                    delta = abs(dt - target_unix)
+                    if delta < best_diff:
+                        best_diff = delta
+                        best_aqi = entry
+
+                aqi = best_aqi.get("main", {}).get("aqi") if best_aqi else None
+
+                result[time_vis] = Weather(
+                    cloud_coverage=cloud_coverage,
+                    avgvis_km=avgvis_km,
+                    avgvis_miles=avgvis_km * 0.621371,
+                    condition=condition,
+                    aqi=aqi,
+                )
+
+            return result
+
+        except Exception as e:
+            print(f"[OpenWeatherMapService] Error fetching batched weather: {e}")
+            return {t: None for t in times}

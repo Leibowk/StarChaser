@@ -15,6 +15,16 @@ class VisibilityService:
         self.lp_service = LightPollutionService()
         self.weather_service = OpenWeatherMapService()
 
+    VISIBILITY_THRESHOLDS = {
+        SiteVisibility.Perfect: 99,
+        SiteVisibility.Amazing: 90,
+        SiteVisibility.Great: 80,
+        SiteVisibility.Good: 60,
+        SiteVisibility.Ok: 50,
+        SiteVisibility.Bad: 30,
+        SiteVisibility.Terrible: 0
+    }
+
     def compute_visibility(self, lat, long, time_visibility: Optional[TimeVisibility] = None) -> Visibility:
 
         lp = self.lp_service.get_for_location(lat, long)
@@ -30,6 +40,26 @@ class VisibilityService:
             light_pollution=lp,
             weather=weather,
         )
+
+    def compute_visibilities(self, lat, long, times: list[TimeVisibility]) -> dict[TimeVisibility, Visibility]:
+        lp = self.lp_service.get_for_location(lat, long)
+        weathers = self.weather_service.get_forecast_weathers(lat, long, times)
+
+        result = {}
+        for t in times:
+            weather = weathers.get(t)
+            if weather:
+                score = self.compute_score(lp, weather)
+                category = self.category_from_score(score)
+                result[t] = Visibility(
+                    score=score,
+                    category=category,
+                    light_pollution=lp,
+                    weather=weather,
+                )
+            else:
+                result[t] = None
+        return result
     
     def compute_score(self, lp: LightPollution, weather: Weather):
         lp_factor = lp.lp_index/47
@@ -74,6 +104,12 @@ class VisibilityService:
                 return SiteVisibility.Bad
             case _:
                 return SiteVisibility.Terrible
+    
+    def score_from_category(self, category: Optional[SiteVisibility] = None) -> int:
+        if category == None:
+            return 0
+        
+        return self.VISIBILITY_THRESHOLDS[category]
 
     @staticmethod      
     def meets_visibility_threshold(score: float, min_category: SiteVisibility) -> bool:
