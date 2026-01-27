@@ -40,22 +40,20 @@ class SiteService:
             )
         return sites
 
-    def get_site(self, site_id: int, time: Optional[TimeVisibility] = None) -> Site:
+    def get_site(self, site_id: int, time: TimeVisibility) -> Site:
         r = self.site_repo.get_site(site_id)
         if not r:
             return None
 
-        if time is not None:
-            night_date = SiteService.resolve_night_date(time)
-            vis_record = self.site_repo.get_visibility(site_id, night_date)
-            if vis_record:
-                visibility = Visibility(
-                    score=vis_record.score,
-                    weather=vis_record.weather,
-                    light_pollution=vis_record.light_pollution
+        night_date = self.resolve_night_date(time)
+        vis_record = self.site_repo.get_visibility(site_id, night_date)
+        if vis_record:
+            visibility = Visibility(
+                score=vis_record.score,
+                category=VisibilityService.category_from_score(vis_record.score),
+                weather=Weather(**vis_record.weather) if vis_record.weather else None,
+                light_pollution=LightPollution(**vis_record.light_pollution) if vis_record.light_pollution else None
                 )
-            else:
-                visibility = self.visibility_service.compute_visibility(r.latitude, r.longitude, time)
         else:
             visibility = self.visibility_service.compute_visibility(r.latitude, r.longitude, time)
 

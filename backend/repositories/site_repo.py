@@ -38,7 +38,9 @@ class SiteRepository:
             and_(SiteVisibilityDB.site_id == site_id, SiteVisibilityDB.date == date)
         )
         result = self.session.execute(query).first()
-        return result
+        if result:
+            return result[0]
+        return None
     
 
     def search(
