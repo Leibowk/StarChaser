@@ -2,6 +2,7 @@ from typing import Optional
 from fastapi import FastAPI, Query, Security
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.security import APIKeyHeader, HTTPBearer
+from jobs.visibility_job import run_visibility_job
 from middleware.rate_limit import register_rate_limiter
 from middleware.auth import APIKeyMiddleware
 from enums.time_visibility import TimeVisibility
@@ -20,6 +21,7 @@ swagger_api_key = APIKeyHeader(name="x-api-key", auto_error=False)
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     start_scheduler()
+    await run_visibility_job()
     yield
 
 app = FastAPI(

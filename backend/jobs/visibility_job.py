@@ -4,7 +4,7 @@ import logging
 
 logger = logging.getLogger(__name__)
 
-def run_visibility_job():
+async def run_visibility_job():
     logger.info("Starting visibility precompute job")
 
     try:
@@ -16,7 +16,7 @@ def run_visibility_job():
             TimeVisibility.NIGHTS_3_FROM_NOW,
         ]
 
-        site_service.precompute_visibility(time_buckets)
+        await site_service.precompute_visibility(time_buckets)
 
         logger.info("Finished visibility precompute job")
     except Exception as e:
