@@ -5,6 +5,7 @@ from models.site_visibility_db import SiteVisibilityDB
 from sqlalchemy import and_, select, func
 from db import AsyncSessionLocal
 from geoalchemy2 import Geometry
+from enums.search_order import SearchOrder
 
 
 class SiteRepository:
@@ -49,12 +50,25 @@ class SiteRepository:
 
     async def search(
         self,
+        lat: float,
+        lon: float,
+        drive_time_polygon: dict,
+        date: date,
+        min_score: int,
+        limit: int,
+        offset: int,
+        order_by: SearchOrder,
         name: Optional[str] = None,
-        drive_time_polygon: Optional[dict] = None,
-        date: Optional[date] = None,
-        min_score: Optional[int] = None):
-
+    ):
         async with AsyncSessionLocal() as session:
+            user_point = func.ST_SetSRID(func.ST_MakePoint(lon, lat), 4326)
+            distance_expr = func.ST_Distance(SiteDB.geom.cast(Geometry), user_point)
+
+            polygon_geom = func.ST_SetSRID(
+                func.ST_GeomFromGeoJSON(drive_time_polygon),
+                4326
+            )
+
             query = select(
                 SiteDB.id,
                 SiteDB.name,
@@ -66,30 +80,22 @@ class SiteRepository:
                 SiteVisibilityDB.light_pollution
             ).join(SiteVisibilityDB, and_(SiteDB.id == SiteVisibilityDB.site_id, SiteVisibilityDB.date == date))
 
-            filters = []
-
-            # --- Name filter (case-insensitive contains) ---
+            filters = [
+                func.ST_Intersects(SiteDB.geom, polygon_geom),
+                SiteVisibilityDB.score >= min_score,
+            ]
             if name:
                 filters.append(SiteDB.name.ilike(f"%{name}%"))
 
-            if drive_time_polygon is not None:
-                polygon_geom = func.ST_SetSRID(
-                    func.ST_GeomFromGeoJSON(drive_time_polygon),
-                    4326
-                )
+            query = query.where(and_(*filters))
 
-                filters.append(
-                    func.ST_Intersects(
-                        SiteDB.geom,
-                        polygon_geom
-                    )
-                )
+            # Composite ORDER BY: always both columns
+            if order_by == SearchOrder.Visibility:
+                query = query.order_by(SiteVisibilityDB.score.desc(), distance_expr.asc())
+            else:
+                query = query.order_by(distance_expr.asc(), SiteVisibilityDB.score.desc())
 
-            if min_score is not None:
-                filters.append(SiteVisibilityDB.score >= min_score)
-
-            if filters:
-                query = query.where(and_(*filters))
+            query = query.limit(limit).offset(offset)
 
             result = await session.execute(query)
             return result.all()

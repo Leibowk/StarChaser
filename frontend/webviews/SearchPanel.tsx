@@ -6,12 +6,16 @@ import { TIME_OPTIONS } from '../lib/types';
 
 export type SearchParams = {
   name?: string;
-  lat?: number;
-  lon?: number;
-  drive_time?: number;
+  lat: number;
+  lon: number;
+  drive_time: number;
   visib?: string;
   time?: string;
+  order_by?: 'Visibility' | 'Distance';
 };
+
+const ORDER_BY_OPTIONS = ['Visibility', 'Distance'] as const;
+type OrderByOption = typeof ORDER_BY_OPTIONS[number];
 
 type Props = {
   onSearch: (params: SearchParams) => void;
@@ -33,75 +37,59 @@ type TimeOption = typeof TIME_OPTIONS[number];
 
 export const SearchPanel = ({ onSearch }: Props) => {
   const [name, setName] = useState('');
-  const [useLocation, setUseLocation] = useState(true);
   const [driveTime, setDriveTime] = useState('15');
   const [driveTimeError, setDriveTimeError] = useState<string | null>(null);
-    const handleDriveTimeChange = (value: string) => {
-      // Only allow numbers and empty string
-      if (!/^\d*$/.test(value)) return;
-      const num = parseInt(value, 10);
-      if (value && (!Number.isNaN(num) && num > 60)) {
-        setDriveTimeError('Drive time cannot exceed 60 minutes.');
-        setDriveTime('60');
-      } else {
-        setDriveTimeError(null);
-        setDriveTime(value);
-      }
-    };
+  const handleDriveTimeChange = (value: string) => {
+    if (!/^\d*$/.test(value)) return;
+    const num = parseInt(value, 10);
+    if (value && (!Number.isNaN(num) && num > 60)) {
+      setDriveTimeError('Drive time cannot exceed 60 minutes.');
+      setDriveTime('60');
+    } else {
+      setDriveTimeError(null);
+      setDriveTime(value);
+    }
+  };
   const [siteVisib, setSiteVisib] = useState<VisibilityOption>('Any');
   const [timeVisibility, setTimeVisibility] = useState<TimeOption>('Tonight');
+  const [orderBy, setOrderBy] = useState<OrderByOption>('Visibility');
   const [locationGranted, setLocationGranted] = useState(false);
   const [loading, setLoading] = useState(false);
-  const [cachedLocation, setCachedLocation] = useState<{lat:number, lon:number} | null>(null);
+  const [cachedLocation, setCachedLocation] = useState<{ lat: number; lon: number } | null>(null);
+
   useEffect(() => {
-    if (useLocation && !cachedLocation && locationGranted) {
-    Location.getCurrentPositionAsync({}).then(loc => {
-      setCachedLocation({ lat: loc.coords.latitude, lon: loc.coords.longitude });
-    }).catch(err => console.warn(err));
-  }
-}, [useLocation, locationGranted]);
+    Location.getForegroundPermissionsAsync().then(({ status }) => {
+      setLocationGranted(status === 'granted');
+    });
+  }, []);
+
+  useEffect(() => {
+    if (locationGranted && !cachedLocation) {
+      Location.getCurrentPositionAsync({})
+        .then((loc) => setCachedLocation({ lat: loc.coords.latitude, lon: loc.coords.longitude }))
+        .catch((err) => console.warn(err));
+    }
+  }, [locationGranted, cachedLocation]);
+
+  const canSearch = locationGranted && cachedLocation != null && driveTime && !driveTimeError;
+  const driveTimeNum = parseInt(driveTime, 10);
+  const isDriveTimeValid = !Number.isNaN(driveTimeNum) && driveTimeNum >= 1 && driveTimeNum <= 60;
 
   const handleSearch = async () => {
-    if (loading || driveTimeError) return; // prevent double taps or error
+    if (loading || driveTimeError || !canSearch || !cachedLocation || !isDriveTimeValid) return;
     setLoading(true);
 
-    let lat: number | undefined;
-    let lon: number | undefined;
-
-    if (useLocation) {
-      try {
-        const { status } = await Location.getForegroundPermissionsAsync();
-        if (status !== 'granted') {
-          Alert.alert('Location required', 'Please enable location permission to search nearby.');
-        } else {
-          // fetch location if not cached
-          if (cachedLocation) {
-            lat = cachedLocation.lat;
-            lon = cachedLocation.lon;
-          } else {
-            const current = await Location.getCurrentPositionAsync({});
-            lat = current.coords.latitude;
-            lon = current.coords.longitude;
-            setCachedLocation({ lat, lon }); // cache for next time
-          }
-        }
-      } catch (err) {
-        console.warn('Location fetch failed', err);
-        Alert.alert('Error', 'Could not get your current location.');
-      }
-    }
-
-    const params: SearchParams = {
-      name: name.trim() || undefined,
-      lat,
-      lon,
-      visib: siteVisib !== 'Any' ? siteVisib : undefined,
-      time: timeVisibility,
-      ...(useLocation && lat != null && lon != null ? { drive_time: parseFloat(driveTime) } : {}),
-    };
-
     try {
-      await onSearch(params); // await backend call
+      const params: SearchParams = {
+        name: name.trim() || undefined,
+        lat: cachedLocation.lat,
+        lon: cachedLocation.lon,
+        drive_time: driveTimeNum,
+        visib: siteVisib !== 'Any' ? siteVisib : undefined,
+        time: timeVisibility,
+        order_by: orderBy,
+      };
+      await onSearch(params);
     } finally {
       setLoading(false);
     }
@@ -109,7 +97,28 @@ export const SearchPanel = ({ onSearch }: Props) => {
 
   return (
     <View style={styles.container}>
-      <Text style={styles.label}>Search by name:</Text>
+      {!locationGranted && (
+        <View style={styles.locationPrompt}>
+          <Text style={styles.warningText}>
+            Location is required to search sites near you.
+          </Text>
+          <Button
+            title="Enable Location"
+            onPress={async () => {
+              const { status } = await Location.requestForegroundPermissionsAsync();
+              setLocationGranted(status === 'granted');
+              if (status !== 'granted') {
+                Alert.alert(
+                  'Location required',
+                  'Please enable location permission in settings to search.'
+                );
+              }
+            }}
+          />
+        </View>
+      )}
+
+      <Text style={styles.label}>Search by name (optional):</Text>
       <TextInput
         style={styles.input}
         value={name}
@@ -118,31 +127,31 @@ export const SearchPanel = ({ onSearch }: Props) => {
         placeholderTextColor="#ccc"
       />
 
-      <View style={styles.row}>
-        <Text style={styles.label}>Search near my location:</Text>
-        <Button
-          title={useLocation ? 'Yes' : 'No'}
-          onPress={() => setUseLocation((prev) => !prev)}
-        />
-      </View>
-
-      {useLocation && (
-        <>
-          <Text style={styles.label}>Drive Time (minutes):</Text>
-          <TextInput
-            style={[styles.input, driveTimeError && { borderColor: 'red' }]}
-            value={driveTime}
-            onChangeText={handleDriveTimeChange}
-            keyboardType="numeric"
-            placeholder="Enter drive time in minutes"
-            placeholderTextColor="#ccc"
-            maxLength={2}
-          />
-          {driveTimeError && (
-            <Text style={styles.errorText}>{driveTimeError}</Text>
-          )}
-        </>
+      <Text style={styles.label}>Drive Time (minutes):</Text>
+      <Text style={styles.subLabel}>(required - sites within this drive time of your location)</Text>
+      <TextInput
+        style={[styles.input, driveTimeError && { borderColor: 'red' }]}
+        value={driveTime}
+        onChangeText={handleDriveTimeChange}
+        keyboardType="numeric"
+        placeholder="Enter drive time in minutes"
+        placeholderTextColor="#ccc"
+        maxLength={2}
+      />
+      {driveTimeError && (
+        <Text style={styles.errorText}>{driveTimeError}</Text>
       )}
+
+      <Text style={styles.label}>Order by:</Text>
+      <Picker
+        selectedValue={orderBy}
+        onValueChange={(value: OrderByOption) => setOrderBy(value)}
+        style={styles.picker}
+        dropdownIconColor="#FFD700"
+      >
+        <Picker.Item label="Visibility (best first)" value="Visibility" color="#FFD700" />
+        <Picker.Item label="Distance (closest first)" value="Distance" color="#FFD700" />
+      </Picker>
 
       <Text style={styles.label}>Visibility rating:</Text>
       <Text style={styles.subLabel}>(returns all sites better than selected Visibility)</Text>
@@ -174,8 +183,8 @@ export const SearchPanel = ({ onSearch }: Props) => {
       <TouchableOpacity
         onPress={handleSearch}
         activeOpacity={0.6}
-        style={styles.searchButton}
-        disabled={loading || !!driveTimeError}
+        style={[styles.searchButton, !canSearch && styles.searchButtonDisabled]}
+        disabled={loading || !!driveTimeError || !canSearch || !isDriveTimeValid}
       >
         <Text style={styles.searchButtonText}>{loading ? 'Searching...' : 'Search'}</Text>
       </TouchableOpacity>
@@ -227,6 +236,17 @@ const styles = StyleSheet.create({
     borderRadius: 8,
     alignItems: 'center',
     marginTop: 16,
+  },
+  searchButtonDisabled: {
+    opacity: 0.5,
+  },
+  locationPrompt: {
+    marginBottom: 12,
+  },
+  warningText: {
+    color: '#FFA500',
+    marginBottom: 8,
+    fontWeight: 'bold',
   },
   searchButtonText: {
     color: '#000',
