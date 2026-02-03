@@ -14,10 +14,10 @@ from schemas.weather import Weather
 
 @pytest.fixture
 def visibility_service():
-    svc = VisibilityService()
-    svc.lp_service = LPServiceMock()
-    svc.weather_service = OpenWeatherMapServiceMock()
-    return svc
+    return VisibilityService(
+        lp_service=LPServiceMock(),
+        weather_service=OpenWeatherMapServiceMock(),
+    )
 
 
 # ---------------------------------------------------------------------------

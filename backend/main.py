@@ -1,5 +1,5 @@
 from typing import Optional
-from fastapi import FastAPI, Query, Security
+from fastapi import Depends, FastAPI, Query, Request, Security
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.security import APIKeyHeader, HTTPBearer
 from jobs.visibility_job import run_visibility_job
@@ -8,6 +8,7 @@ from middleware.auth import APIKeyMiddleware
 from enums.time_visibility import TimeVisibility
 from enums.site_visibility import SiteVisibility
 from enums.search_order import SearchOrder
+from dependencies import create_site_service, get_site_service
 from services.site_service import SiteService
 from fastapi.staticfiles import StaticFiles
 from schemas.site import Site
@@ -21,8 +22,10 @@ swagger_api_key = APIKeyHeader(name="x-api-key", auto_error=False)
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
-    start_scheduler()
-    await run_visibility_job()
+    site_service = create_site_service()
+    app.state.site_service = site_service
+    start_scheduler(app)
+    await run_visibility_job(site_service)
     yield
 
 app = FastAPI(
@@ -50,23 +53,23 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-# Initialize repository
-site_service = SiteService()
-
 # Serve light pollution tiles
 tiles_dir = os.path.join(os.path.dirname(__file__), "image_tiles")
 app.mount("/tiles", StaticFiles(directory=tiles_dir), name="tiles")
 
 @app.get("/sites", response_model=list[SiteSummary])
-async def get_sites() -> list[SiteSummary]:
+async def get_sites(site_service: SiteService = Depends(get_site_service)) -> list[SiteSummary]:
     return await site_service.get_all_sites()
 
 @app.get("/site/{site_id}", response_model=Site)
-async def get_site(site_id: int,
-             time: Optional[TimeVisibility] = Query(
-                TimeVisibility.TONIGHT,
-                description="Time window used to evaluate site visibility. Note: TimeVisibility.NOW is currently unimplemented and defaults to tonight. (job does not precompute it)."
-            )) -> Site:
+async def get_site(
+    site_id: int,
+    time: Optional[TimeVisibility] = Query(
+        TimeVisibility.TONIGHT,
+        description="Time window used to evaluate site visibility. Note: TimeVisibility.NOW is currently unimplemented and defaults to tonight. (job does not precompute it)."
+    ),
+    site_service: SiteService = Depends(get_site_service),
+) -> Site:
     return await site_service.get_site(site_id, time)
 
 @app.get(
@@ -94,7 +97,8 @@ async def search(
     ),
     limit: int = Query(25, ge=1, le=500, description="Max results per page"),
     offset: int = Query(0, ge=0, description="Number of results to skip"),
-    order_by: SearchOrder = Query(SearchOrder.Visibility, description="Primary sort: Distance or Visibility")
+    order_by: SearchOrder = Query(SearchOrder.Visibility, description="Primary sort: Distance or Visibility"),
+    site_service: SiteService = Depends(get_site_service),
 ) -> list[Site]:
     return await site_service.search(
         visib=visib,
@@ -109,8 +113,7 @@ async def search(
     )
 
 @app.post("/jobs/visibility/run")
-async def run_visibility_job_now():
-    site_service = SiteService()
+async def run_visibility_job_now(site_service: SiteService = Depends(get_site_service)):
     await site_service.precompute_visibility([
         TimeVisibility.TONIGHT,
         TimeVisibility.TOMORROW_NIGHT,

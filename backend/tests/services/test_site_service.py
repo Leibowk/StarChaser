@@ -3,18 +3,17 @@ import pytest_asyncio
 from services.site_service import SiteService
 from schemas.site import Site
 from schemas.site_summary import SiteSummary
-from ..mocks.services import LPServiceMock, WeatherApiServiceMock, VisibilityServiceMock
+from ..mocks.services import LPServiceMock, VisibilityServiceMock
 from ..mocks.repos import SiteRepoMock
 from enums.time_visibility import TimeVisibility
 
 @pytest_asyncio.fixture
 async def site_service():
-    svc = SiteService()
-    svc.visibility_service = VisibilityServiceMock()
-    svc.site_repo = SiteRepoMock()
-    svc.lp_service = LPServiceMock()
-    svc.weather_service = WeatherApiServiceMock()
-    return svc
+    return SiteService(
+        site_repo=SiteRepoMock(),
+        visibility_service=VisibilityServiceMock(),
+        lp_service=LPServiceMock(),
+    )
 
 @pytest.mark.asyncio
 async def test_get_all_sites(site_service):

@@ -8,12 +8,12 @@ from services.date_time_service import DateTimeService
 
 
 class OpenWeatherMapService:
-    def __init__(self, http_client=None):
+    def __init__(self, http_client=None, date_time_service=None):
         self.http_client = http_client or httpx.AsyncClient()
         self.base_url = settings.OPEN_WEATHER_MAP.URL
         self.api_key = settings.OPEN_WEATHER_MAP.API_KEY
         self.timeout = 5  # seconds
-        self.datetimeservice = DateTimeService()
+        self.datetimeservice = date_time_service or DateTimeService()
 
     async def get_forecast_weather(self, lat: float, lon: float, time_visibility: Optional[TimeVisibility]) -> Optional[Weather]:
         daytime = self.datetimeservice.date_time_helper(time_visibility)

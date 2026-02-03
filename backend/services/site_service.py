@@ -16,11 +16,17 @@ import logging
 import time
 
 class SiteService:
-    def __init__(self):
-        self.site_repo = SiteRepository()
-        self.lp_service = LightPollutionService()
-        self.visibility_service = VisibilityService()
-        self.drive_service = DriveTimeService()
+    def __init__(
+        self,
+        site_repo=None,
+        lp_service=None,
+        visibility_service=None,
+        drive_service=None,
+    ):
+        self.site_repo = site_repo or SiteRepository()
+        self.lp_service = lp_service or LightPollutionService()
+        self.visibility_service = visibility_service or VisibilityService()
+        self.drive_service = drive_service or DriveTimeService()
 
     async def get_all_sites(self) -> list[SiteSummary]:
         rows = await self.site_repo.get_all_sites()

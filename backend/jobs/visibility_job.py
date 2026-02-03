@@ -4,12 +4,10 @@ import logging
 
 logger = logging.getLogger(__name__)
 
-async def run_visibility_job():
+async def run_visibility_job(site_service: SiteService):
     logger.info("Starting visibility precompute job")
 
     try:
-        site_service = SiteService()
-
         time_buckets = [
             TimeVisibility.TONIGHT,
             TimeVisibility.TOMORROW_NIGHT,

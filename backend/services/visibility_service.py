@@ -9,9 +9,13 @@ from services.open_weather_map_service import OpenWeatherMapService
 
 
 class VisibilityService:
-    def __init__(self):
-        self.lp_service = LightPollutionService()
-        self.weather_service = OpenWeatherMapService()
+    def __init__(
+        self,
+        lp_service=None,
+        weather_service=None,
+    ):
+        self.lp_service = lp_service or LightPollutionService()
+        self.weather_service = weather_service or OpenWeatherMapService()
 
     VISIBILITY_THRESHOLDS = {
         SiteVisibility.Perfect: 99,
