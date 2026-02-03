@@ -65,7 +65,7 @@ async def get_sites() -> list[SiteSummary]:
 async def get_site(site_id: int,
              time: Optional[TimeVisibility] = Query(
                 TimeVisibility.TONIGHT,
-                description="Time window used to evaluate site visibility"
+                description="Time window used to evaluate site visibility. Note: TimeVisibility.NOW is currently unimplemented and defaults to tonight. (job does not precompute it)."
             )) -> Site:
     return await site_service.get_site(site_id, time)
 
@@ -90,7 +90,7 @@ async def search(
     ),
     time: Optional[TimeVisibility] = Query(
         TimeVisibility.TONIGHT,
-        description="Time window used to evaluate site visibility"
+        description="Time window used to evaluate site visibility. Note: TimeVisibility.NOW is currently unimplemented (job does not precompute it)."
     ),
     limit: int = Query(25, ge=1, le=500, description="Max results per page"),
     offset: int = Query(0, ge=0, description="Number of results to skip"),

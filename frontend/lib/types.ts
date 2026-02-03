@@ -39,7 +39,6 @@ export type WeatherData = {
 };
 
 export const TIME_OPTIONS = [
-  'Now',
   'Tonight',
   'Tomorrow Night',
   'Three Nights From Now',
