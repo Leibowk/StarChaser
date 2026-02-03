@@ -7,6 +7,7 @@ from middleware.rate_limit import register_rate_limiter
 from middleware.auth import APIKeyMiddleware
 from enums.time_visibility import TimeVisibility
 from enums.site_visibility import SiteVisibility
+from enums.search_order import SearchOrder
 from services.site_service import SiteService
 from fastapi.staticfiles import StaticFiles
 from schemas.site import Site
@@ -74,18 +75,15 @@ async def get_site(site_id: int,
         summary="Search observation sites",
         description=(
             "Search sites by name and/or proximity.\n\n"
-            "- `name`: substring match on site name\n"
-            "- `lat`, `lon`, `radius_km`: return sites within a radius\n"
-            "- Parameters may be combined (AND logic)"
+            "- `lat`, `lon`, `drive_time`: required - return sites within drive time of location\n"
+            "- `name`: optional substring match on site name\n"
+            "- `limit`, `offset`: pagination; `order_by`: Distance or Visibility"
         ))
 async def search(
+    lat: float = Query(..., description="Latitude (required)"),
+    lon: float = Query(..., description="Longitude (required)"),
+    drive_time: int = Query(..., description="Drive time to site in minutes (required)"),
     name: Optional[str] = None,
-    lat: Optional[float] = None,
-    lon: Optional[float] = None,
-    drive_time: Optional[int] = Query(
-        None,
-        description="Drive time to site in minutes"
-    ),
     visib: Optional[SiteVisibility] = Query(
         SiteVisibility.Terrible,
         description="Overall site visibility rating",
@@ -93,16 +91,22 @@ async def search(
     time: Optional[TimeVisibility] = Query(
         TimeVisibility.TONIGHT,
         description="Time window used to evaluate site visibility"
-    )) -> list[Site]:
-    if drive_time is not None and (lat is None or lon is None):
-        raise ValueError("lat/lon required when using drive_time")
-        
-    return await site_service.search(visib,
-                               time,
-                               name,
-                               lat, 
-                               lon, 
-                               drive_time)
+    ),
+    limit: int = Query(25, ge=1, le=500, description="Max results per page"),
+    offset: int = Query(0, ge=0, description="Number of results to skip"),
+    order_by: SearchOrder = Query(SearchOrder.Visibility, description="Primary sort: Distance or Visibility")
+) -> list[Site]:
+    return await site_service.search(
+        visib=visib,
+        time=time,
+        lat=lat,
+        lon=lon,
+        drive_time=drive_time,
+        name=name,
+        limit=limit,
+        offset=offset,
+        order_by=order_by,
+    )
 
 @app.post("/jobs/visibility/run")
 async def run_visibility_job_now():

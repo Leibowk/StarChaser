@@ -4,6 +4,7 @@ from schemas.light_pollution import LightPollution
 from schemas.weather import Weather
 from enums.time_visibility import TimeVisibility
 from enums.site_visibility import SiteVisibility
+from enums.search_order import SearchOrder
 from schemas.visibility import Visibility
 from repositories.site_repo import SiteRepository
 from services.visibility_service import VisibilityService
@@ -67,19 +68,29 @@ class SiteService:
         self,
         visib: SiteVisibility,
         time: TimeVisibility,
+        lat: float,
+        lon: float,
+        drive_time: int,
+        limit: int,
+        offset: int,
+        order_by: SearchOrder,
         name: Optional[str] = None,
-        lat: Optional[float] = None,
-        lon: Optional[float] = None,
-        drive_time: Optional[int] = None
     ) -> list[Site]:
-        polygon = None
-        if drive_time is not None:
-            polygon = await self.drive_service.get_drive_time_polygon(lat, lon, drive_time)
-
+        polygon = await self.drive_service.get_drive_time_polygon(lat, lon, drive_time)
         night_date = self.resolve_night_date(time)
         min_score = self.visibility_service.score_from_category(visib)
 
-        rows = await self.site_repo.search(name, polygon, night_date, min_score)
+        rows = await self.site_repo.search(
+            lat=lat,
+            lon=lon,
+            drive_time_polygon=polygon,
+            date=night_date,
+            min_score=min_score,
+            limit=limit,
+            offset=offset,
+            order_by=order_by,
+            name=name,
+        )
         sites = []
         for r in rows:
             visibility = Visibility(
@@ -142,6 +153,7 @@ class SiteService:
         today = date.today()
 
         return {
+            TimeVisibility.NOW: today,
             TimeVisibility.TONIGHT: today,
             TimeVisibility.TOMORROW_NIGHT: today + timedelta(days=1),
             TimeVisibility.NIGHTS_3_FROM_NOW: today + timedelta(days=2),
