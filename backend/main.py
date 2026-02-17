@@ -12,7 +12,6 @@ from dependencies import create_site_service, get_site_service
 from services.site_service import SiteService
 from fastapi.staticfiles import StaticFiles
 from schemas.site import Site
-from schemas.site_summary import SiteSummary
 import os
 from config import settings
 from contextlib import asynccontextmanager
@@ -57,9 +56,16 @@ app.add_middleware(
 tiles_dir = os.path.join(os.path.dirname(__file__), "image_tiles")
 app.mount("/tiles", StaticFiles(directory=tiles_dir), name="tiles")
 
-@app.get("/sites", response_model=list[SiteSummary])
-async def get_sites(site_service: SiteService = Depends(get_site_service)) -> list[SiteSummary]:
-    return await site_service.get_all_sites()
+@app.get("/sites", response_model=list[Site])
+async def get_sites(
+    lat: float = Query(..., description="Map center latitude"),
+    lon: float = Query(..., description="Map center longitude"),
+    zoom: int = Query(..., description="Map zoom level"),
+    limit: int = Query(50, ge=1, le=500, description="Max sites to return"),
+    site_service: SiteService = Depends(get_site_service),
+) -> list[Site]:
+    night_date = SiteService.resolve_night_date(TimeVisibility.TONIGHT)
+    return await site_service.get_sites(lat=lat, lon=lon, zoom=zoom, limit=limit, day=night_date)
 
 @app.get("/site/{site_id}", response_model=Site)
 async def get_site(

@@ -1,3 +1,4 @@
+import json
 from typing import Optional
 from datetime import date
 from models.site_db import SiteDB
@@ -13,6 +14,7 @@ class SiteRepository:
         pass
 
     async def get_all_sites(self):
+        """Returns all sites (for precompute_visibility)."""
         async with AsyncSessionLocal() as session:
             query = select(
                 SiteDB.id,
@@ -21,6 +23,46 @@ class SiteRepository:
                 func.ST_X(SiteDB.geom.cast(Geometry)).label("longitude"),
                 func.ST_Y(SiteDB.geom.cast(Geometry)).label("latitude")
             )
+            result = await session.execute(query)
+            return result.all()
+
+    async def get_sites(
+        self,
+        lat: float,
+        lon: float,
+        search_polygon: dict,
+        limit: int,
+        date: date,
+    ):
+        """Returns best (limit) sites in search_polygon, joined with visibility for date.
+        Ordered by score DESC, then distance from (lat, lon) ASC for stable tie-breaking."""
+        async with AsyncSessionLocal() as session:
+            user_point = func.ST_SetSRID(func.ST_MakePoint(lon, lat), 4326)
+            distance_expr = func.ST_Distance(SiteDB.geom.cast(Geometry), user_point)
+
+            polygon_geom = func.ST_SetSRID(
+                func.ST_GeomFromGeoJSON(json.dumps(search_polygon)),
+                4326
+            )
+            query = select(
+                SiteDB.id,
+                SiteDB.name,
+                SiteDB.description,
+                func.ST_X(SiteDB.geom.cast(Geometry)).label("longitude"),
+                func.ST_Y(SiteDB.geom.cast(Geometry)).label("latitude"),
+                SiteVisibilityDB.score,
+                SiteVisibilityDB.weather,
+                SiteVisibilityDB.light_pollution,
+            ).join(
+                SiteVisibilityDB,
+                and_(SiteDB.id == SiteVisibilityDB.site_id, SiteVisibilityDB.date == date)
+            ).where(
+                func.ST_Intersects(SiteDB.geom, polygon_geom)
+            ).order_by(
+                SiteVisibilityDB.score.desc(),
+                distance_expr.asc()
+            ).limit(limit)
+
             result = await session.execute(query)
             return result.all()
 
@@ -65,7 +107,7 @@ class SiteRepository:
             distance_expr = func.ST_Distance(SiteDB.geom.cast(Geometry), user_point)
 
             polygon_geom = func.ST_SetSRID(
-                func.ST_GeomFromGeoJSON(drive_time_polygon),
+                func.ST_GeomFromGeoJSON(json.dumps(drive_time_polygon) if isinstance(drive_time_polygon, dict) else drive_time_polygon),
                 4326
             )
 

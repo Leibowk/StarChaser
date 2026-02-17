@@ -11,8 +11,8 @@ from services.visibility_service import VisibilityService
 from services.light_pollution_service import LightPollutionService
 from services.drive_time_service import DriveTimeService
 from schemas.site import Site
-from schemas.site_summary import SiteSummary
 import logging
+from utils.geo import zoom_to_polygon_geojson
 import time
 
 class SiteService:
@@ -28,19 +28,39 @@ class SiteService:
         self.visibility_service = visibility_service or VisibilityService()
         self.drive_service = drive_service or DriveTimeService()
 
-    async def get_all_sites(self) -> list[SiteSummary]:
-        rows = await self.site_repo.get_all_sites()
+    async def get_sites(
+        self,
+        lat: float,
+        lon: float,
+        zoom: int,
+        limit: int,
+        day: date,
+    ) -> list[Site]:
+        """Returns best (limit) sites in viewport, with visibility. Uses TONIGHT visibility data."""
+        search_polygon = zoom_to_polygon_geojson(lat, lon, zoom)
+        rows = await self.site_repo.get_sites(
+            lat=lat,
+            lon=lon,
+            search_polygon=search_polygon,
+            limit=limit,
+            date=day,
+        )
         sites = []
         for r in rows:
-            lp = self.lp_service.get_for_location(r.latitude, r.longitude)
+            visibility = Visibility(
+                score=r.score,
+                category=VisibilityService.category_from_score(r.score),
+                weather=Weather(**r.weather) if r.weather else None,
+                light_pollution=LightPollution(**r.light_pollution) if r.light_pollution else None
+            )
             sites.append(
-                SiteSummary(
+                Site(
                     id=r.id,
                     name=r.name,
                     description=r.description,
                     latitude=r.latitude,
                     longitude=r.longitude,
-                    light_pollution=lp,
+                    visibility=visibility,
                 )
             )
         return sites

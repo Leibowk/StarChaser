@@ -81,6 +81,9 @@
 
 <script>
   window.initMap = function() {
+    if (window.__map) {
+      return;
+    }
     const osm = L.tileLayer(
       'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',
       { maxZoom: 19, attribution: '© OpenStreetMap contributors' }
@@ -116,9 +119,10 @@
       }
     );
 
+    var view = window.__INITIAL_VIEW__ || { lat: 48.75, lon: -122.52, zoom: 9 };
     const map = L.map('map', {
-      center: [48.75, -122.52],
-      zoom: 9,
+      center: [view.lat, view.lon],
+      zoom: view.zoom,
       layers: [osm, light2024, visibility2024],
       worldCopyJump: true
     });
@@ -131,6 +135,24 @@
     ).addTo(map);
 
     const parkLayer = L.layerGroup().addTo(map);
+
+    function fireViewChange() {
+      const c = map.getCenter();
+      const z = map.getZoom();
+      if (window.ReactNativeWebView) {
+        window.ReactNativeWebView.postMessage(JSON.stringify({
+          type: 'viewChange',
+          lat: c.lat,
+          lon: c.lng,
+          zoom: z
+        }));
+      }
+    }
+    fireViewChange();
+    map.on('moveend', fireViewChange);
+    map.on('zoomend', fireViewChange);
+
+    window.__map = map;
 
     // Define the custom telescope icon
     const telescopeIcon = L.divIcon({
@@ -148,17 +170,24 @@
           interactive: true
         });
 
-        const lp = site.lightPollution;
+        const v = site.visibility;
+        const lp = v?.lightPollution ?? site.lightPollution;
 
         const popupHtml = `
           <div class="space-popup">
             <h3>${site.name}</h3>
-            <p>${site.description}</p>
-            <b>Light Pollution</b><br/>
-            Zone: <span class="lp-zone">${lp?.lpZone ?? 'N/A'}</span>
+            <p>${site.description || ''}</p>
+            ${v ? `
+            <b>Visibility</b><br/>
+            Score: <span>${v.score?.toFixed(1) ?? 'N/A'}</span> | ${v.category ?? 'N/A'}<br/>
+            ${v.weather ? `
+            <b>Weather</b><br/>
+            ${v.weather.condition ?? 'N/A'} | Clouds: ${v.weather.cloudCoverage ?? 'N/A'}%<br/>
+            ` : ''}
+            ` : ''}
+            <b>Light Pollution Zone</b><br/>
+            <span class="lp-zone">${lp?.lpZone ?? 'N/A'}</span>
             <span class="lp-color" style="color: ${lp?.colorZone ?? '#fff'};">&#9608;</span><br/>
-            Index: <span>${lp?.lpIndex?.toFixed(3) ?? 'N/A'}</span><br/>
-            mag/arcsec²: <span>${lp?.magArcSec?.toFixed(2) ?? 'N/A'}</span><br/>
             <button class="popup-btn" onclick='window.ReactNativeWebView && window.ReactNativeWebView.postMessage(JSON.stringify({ type: "siteClick", site: ${JSON.stringify(site.id)} }))'>
               View Details
             </button>

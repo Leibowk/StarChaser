@@ -1,8 +1,8 @@
 import pytest
 import pytest_asyncio
+from datetime import date
 from services.site_service import SiteService
 from schemas.site import Site
-from schemas.site_summary import SiteSummary
 from ..mocks.services import LPServiceMock, VisibilityServiceMock
 from ..mocks.repos import SiteRepoMock
 from enums.time_visibility import TimeVisibility
@@ -16,12 +16,14 @@ async def site_service():
     )
 
 @pytest.mark.asyncio
-async def test_get_all_sites(site_service):
-    sites = await site_service.get_all_sites()
+async def test_get_sites(site_service):
+    night_date = date.today()
+    sites = await site_service.get_sites(lat=48.75, lon=-122.52, zoom=9, limit=50, day=night_date)
     assert len(sites) == 2
     for s in sites:
-        assert isinstance(s, SiteSummary)
-        assert s.light_pollution.lp_zone == "2a"
+        assert isinstance(s, Site)
+        assert s.visibility is not None
+        assert s.visibility.light_pollution.lp_zone == "2a"
 
 
 @pytest.mark.asyncio
