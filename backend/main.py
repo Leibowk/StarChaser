@@ -20,12 +20,17 @@ from jobs.scheduler import start_scheduler
 
 swagger_api_key = APIKeyHeader(name="x-api-key", auto_error=False)
 
+def _should_skip_visibility_job() -> bool:
+    val = os.environ.get("SKIP_VISIBILITY_JOB", "").strip().lower()
+    return val in ("1", "true", "yes")
+
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     site_service = create_site_service()
     app.state.site_service = site_service
     start_scheduler(app)
-    await run_visibility_job(site_service)
+    if not _should_skip_visibility_job():
+        await run_visibility_job(site_service)
     yield
 
 app = FastAPI(

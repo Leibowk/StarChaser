@@ -1,7 +1,7 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { View, TextInput, Text, Button, StyleSheet, Alert, TouchableOpacity } from 'react-native';
 import { Picker } from '@react-native-picker/picker';
-import * as Location from 'expo-location';
+import { useUserLocation } from '../lib/locationService';
 import { TIME_OPTIONS } from '../lib/types';
 
 export type SearchParams = {
@@ -53,23 +53,8 @@ export const SearchPanel = ({ onSearch }: Props) => {
   const [siteVisib, setSiteVisib] = useState<VisibilityOption>('Any');
   const [timeVisibility, setTimeVisibility] = useState<TimeOption>('Tonight');
   const [orderBy, setOrderBy] = useState<OrderByOption>('Visibility');
-  const [locationGranted, setLocationGranted] = useState(false);
   const [loading, setLoading] = useState(false);
-  const [cachedLocation, setCachedLocation] = useState<{ lat: number; lon: number } | null>(null);
-
-  useEffect(() => {
-    Location.getForegroundPermissionsAsync().then(({ status }) => {
-      setLocationGranted(status === 'granted');
-    });
-  }, []);
-
-  useEffect(() => {
-    if (locationGranted && !cachedLocation) {
-      Location.getCurrentPositionAsync({})
-        .then((loc) => setCachedLocation({ lat: loc.coords.latitude, lon: loc.coords.longitude }))
-        .catch((err) => console.warn(err));
-    }
-  }, [locationGranted, cachedLocation]);
+  const { locationGranted, userLocation: cachedLocation, requestPermission } = useUserLocation();
 
   const canSearch = locationGranted && cachedLocation != null && driveTime && !driveTimeError;
   const driveTimeNum = parseInt(driveTime, 10);
@@ -105,9 +90,8 @@ export const SearchPanel = ({ onSearch }: Props) => {
           <Button
             title="Enable Location"
             onPress={async () => {
-              const { status } = await Location.requestForegroundPermissionsAsync();
-              setLocationGranted(status === 'granted');
-              if (status !== 'granted') {
+              const granted = await requestPermission();
+              if (!granted) {
                 Alert.alert(
                   'Location required',
                   'Please enable location permission in settings to search.'

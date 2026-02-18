@@ -116,12 +116,22 @@
       }
     );
 
+    const defaultCenter = [48.75, -122.52];
+    const defaultZoom = 9;
+    const initialCenter = (window.__USER_LOCATION__ && typeof window.__USER_LOCATION__.latitude === 'number')
+      ? [window.__USER_LOCATION__.latitude, window.__USER_LOCATION__.longitude]
+      : defaultCenter;
+
     const map = L.map('map', {
-      center: [48.75, -122.52],
-      zoom: 9,
+      center: initialCenter,
+      zoom: defaultZoom,
       layers: [osm, light2024, visibility2024],
       worldCopyJump: true
     });
+
+    window.setMapCenter = function(lat, lon) {
+      map.setView([lat, lon], defaultZoom);
+    };
 
     L.control.layers({ OpenStreetMap: osm },   
     {

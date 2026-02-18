@@ -58,6 +58,14 @@ cd backend/
 uvicorn main:app --host 0.0.0.0 --port 3000 --reload
 ```
 
+On startup, the backend runs a visibility precompute job by default. To skip it (faster startup):
+```bash
+cd backend/
+set SKIP_VISIBILITY_JOB=1
+uvicorn main:app --host 0.0.0.0 --port 3000 --reload
+```
+(On Unix/macOS use `export SKIP_VISIBILITY_JOB=1` instead of `set`.)
+
 Test your backend is setup by navigating to http://192.168.1.18:3000/docs (or whatever the URL is from ipconfig) and hit an endpoint!
 
 ## Tests
@@ -96,11 +104,16 @@ Cloudflare -> URL redirection
 npm run dev
 ```
 
-Get package.json from dev to run. Requires setting up cloudflare.
-Requirement 
-
+Runs API + Expo + Cloudflare tunnel. On startup, the API runs a visibility precompute job by default. To skip it for faster startup:
 ```bash
-npm i concurrently
+npm run dev:skip-job
+```
+
+Get package.json from dev to run. Requires setting up cloudflare.
+
+Requirements:
+```bash
+npm i concurrently cross-env
 ```
 
 To access website:
@@ -127,7 +140,7 @@ re-run ipconfig and update .env file
 
 Your phone needs to be connected to your wifi (running on the same network)
 
-To debug add a launch.json in the .vscode folder. Then simply set break points and debug!
+To debug add a launch.json in the .vscode folder. Then simply set break points and debug! To skip the visibility job on startup (faster), add `"env": { "SKIP_VISIBILITY_JOB": "1" }` to the configuration.
 ```json
 {
   "version": "0.2.0",
